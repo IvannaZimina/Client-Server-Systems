@@ -34,17 +34,17 @@ Projektis kasutati vastavaid kihte `.valja` reeglitega. Sama spetsiifilisuse kor
 
 ### 8. Arvuta üheksa valija spetsiifilisus ja pane tabelisse.
 
-| spetsiifilisus | selektor |
-|---|---|
-| `0-1-0` | `.valja` |
-| `0-2-0` | `.leht .valja` |
-| `0-0-0` | `:where(h1, h2, h3)` |
-| `0-0-1` | `:is(h2, h3)` |
-| `0-1-2` | `.kaardid > li :is(h2, h3)` |
-| `0-2-1` | `.kaardid > li:not(...)` |
-| `0-2-0` | `.viga:not(:empty)` |
-| `0-2-0` | `:root:not([data-teema="hele"])` |
-| `1-1-0` | `#purchase .valja` |
+| spetsiifilisus | selektor                          |
+|----------------|-----------------------------------|
+| `0-1-0`        | `.valja`                          |
+| `0-2-0`        | `.leht .valja`                    |
+| `0-0-0`        | `:where(h1, h2, h3)`              |
+| `0-0-1`        | `:is(h2, h3)`                     |
+| `0-1-2`        | `.kaardid > li :is(h2, h3)`       |
+| `0-2-1`        | `.kaardid > li:not(...)`          |
+| `0-2-0`        | `.viga:not(:empty)`               |
+| `0-2-0`        | `:root:not([data-teema="hele"])`  |
+| `1-1-0`        | `#purchase .valja`                |
 
 ### 9. Kirjuta `docs/cascade.md`: miks kiht asendab `!important`-i.
 
@@ -58,5 +58,23 @@ git commit -m "C02 Ex3 — Kaskaad, kihid ja disainižetoonid"
 ```
 
 ## Oodatav tulemus
+
+### Faili `docs/cascade.md` tabel
+
+```text
+  0-1-0   .field                           raamistiku vormiväli
+  0-1-0   .field                           meie vormiväli - SAMA
+  0-2-0   .page .field                     vana võte: lisa esivanem
+  0-0-0   :where(h1, h2, h3)               lähtestus
+  0-0-1   :is(h2, h3)                      rühm
+  0-1-2   .cards > li :is(h2, h3)          klass + :is()
+  0-2-1   .cards > li:not(...)             :not() argument loeb
+  0-2-0   .error:not(:empty)               pseudoklass argumendina
+  0-2-0   :root:not([data-theme="light"]) atribuut argumendina
+  1-1-0   #purchase .field                 id võidab kõik klassid
+
+Kiht ours võidab kihti framework 0-1-0 vastu 0-1-0 -
+STRUKTUURSELT, mitte spetsiifilisusega.
+```
 
 Viis kihti, disainižetoonid, süsteemi- ja kasutajateema, `color-scheme` ning arvutatud spetsiifilisuse tabel on dokumenteeritud.

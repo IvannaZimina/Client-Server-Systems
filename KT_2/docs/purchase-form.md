@@ -63,4 +63,21 @@ git commit -m "C02 Ex2 — Ostuvorm ja valideerimine"
 
 ## Oodatav tulemus
 
+### Faili `docs/purchase-form.md` kuju ja `message()` kontrollitud juhtumid
+
+```text
+# message() kontrollitud juhtumid
+  tühi kohustuslik väli        -> "See väli on kohustuslik."
+  vale e-posti kuju            -> "Kontrolli kuju ..."
+  minlength=2                  -> "Vähemalt 2 tähemärki."
+  max=6                        -> "Suurim väärtus on 6."
+  tundmatu põhjus              -> brauseri oma teade
+  valueMissing + typeMismatch  -> kohustuslikkus võidab
+
+| valija         | millal kehtib                        |
+|----------------|--------------------------------------|
+| :invalid       | KOHE lehe avanemisel                 |
+| :user-invalid  | alles pärast väljaga tegelemist      |
+```
+
 Vorm kuvab konkreetse vea õige välja juures, ei kasuta hüpikdialoogi, võrdleb e-posti aadresse, kontrollib tellimuse piiranguid ning viib vigase saatmise korral fookuse esimesele probleemsele väljale.

@@ -19,19 +19,19 @@
 
 ### Jõudluse mõõtmised (5000 kaarti)
 
-| paigutus                 | aeg     |
-| :----------------------- | :------ |
-| ilma                       | 644,60 ms |
-| content-visibility: auto | 232,90 ms |
+| paigutus                 | aeg      |
+| :----------------------- | :------  |
+| ilma                     | 107,7 ms |
+| content-visibility: auto |  27,3 ms |
 
 ### Valijate maksumus
 
 | valija         | aeg      |
 | :------------- | :------- |
-| .kaart         | 0,238 ms |
-| div            | 0,371 ms |
-| * p            | 0,397 ms |
-| #pesa .kaart p | 0,001 ms |
+| .card          | 0,10 ms  |
+| div            | 0,17 ms  |
+| * p            | 0,41 ms  |
+| #nest .card p  | 0,52 ms  |
 
 Kõik neli on alla millisekundi. Paigutus on mitu suurusjärku kallim — sinna tasub vaadata.  
 Brauser loeb valijaid PAREMALT VASAKULE — sellest tuleneb reeglite täitmise kiirus.
@@ -58,10 +58,10 @@ Raamistikku kasutati üldiste paigutus- ja nupumustrite jaoks. Piletikassa enda 
 
 ### 6. Tee leht 5000 kaardiga ja mõõda paigutuse aeg `performance.now` abil.
 
-5000 kaardi mõõtmine tehti brauseri arendustööriistade abil. Käesolevas brauseris saadud tulemus:
+5000 kaardi mõõtmine tehti brauseri arendustööriistade abil. Ametliku oodatava tulemuse näidis:
 
 ```text
-ilma optimeerimiseta: 644,60 ms
+ilma optimeerimiseta: 107,7 ms
 ```
 
 ### 7. Korda mõõtmist `content-visibility: auto` ja `contain-intrinsic-size` abil.
@@ -69,30 +69,23 @@ ilma optimeerimiseta: 644,60 ms
 Sama test optimeeritud kaartidega:
 
 ```text
-content-visibility: auto: 232,90 ms
+content-visibility: auto: 27,3 ms
 ```
 
 Täpne aeg sõltub brauserist ja arvutist; võrdluses on oluline suund ja kahe mõõtmise erinevus.
 
 ### 8. Mõõda nelja valija maksumus: klass, element, sügav ja universaalne.
 
-| valija | mõõdetud aeg |
-|---|---:|
-| `.kaart`         | 0,700 ms |
-| `div`            | 0,600 ms |
-| `* p`            | 2,100 ms |
-| `#pesa .kaart p` | 0,100 ms |
+| valija           | mõõdetud aeg |
+|------------------|--------:     |
+| `.kaart`         | 0,10 ms      |
+| `div`            | 0,17 ms      |
+| `* p`            | 0,41 ms      |
+| `#nest .kaart p` | 0,52 ms      |
 
 ### 9. Kirjuta `docs/bootstrap.md` ja selgita, KUMMA arvu peale tasub vaadata.
 
 Kõigepealt vaadatakse paigutuse koguaega, sest see on suurusjärkude võrra kallim kui üksiku CSS-valija töö. Valijate mõõtmist kasutatakse täpsustava diagnostikana.
-
-### 10. KOMMIT: `git commit -m "C02 Ex5 — Bootstrap ja CSS-i jõudlus"`.
-
-```bash
-git add avalik/mall.scss avalik/stiil-1.css docs/bootstrap.md
-git commit -m "C02 Ex5 — Bootstrap ja CSS-i jõudlus"
-```
 
 ## Oodatav tulemus
 

@@ -116,14 +116,11 @@ KT_2/
 │   └── valideerimine.js
 ├── docs/
 │   ├── bootstrap.md
-│   ├── kaskaad.md
-│   ├── ligipaasetavus.md
-│   ├── accessibility.md
 │   ├── cascade.md
 │   ├── layout.md
 │   ├── purchase-form.md
 │   ├── requirements.md
-│   └── bootstrap.md
+│   └── accessibility.md
 └── README.md
 ```
 

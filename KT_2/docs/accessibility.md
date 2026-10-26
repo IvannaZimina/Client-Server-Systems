@@ -42,15 +42,27 @@ Kontrollitud heleda teema tekstipaarid:
 
 Automaatkontroll ei otsusta, kas alt-tekst kirjeldab pilti õigesti, kas fookusjärjekord on loogiline, kas maamärkide jaotus on kasutajale mõistlik või kas `aria-label` on arusaadav.
 
-### 10. KOMMIT: `git commit -m "C02 Ex1 — Semantika ja ligipääsetavus"`.
-
-Kohustuslik commit-käsk dokumenteeriti:
-
-```bash
-git add avalik docs/accessibility.md
-git commit -m "C02 Ex1 — Semantika ja ligipääsetavus"
-```
-
 ## Oodatav tulemus
 
-Semantiline HTML, nähtav klaviatuurifookus, toimiv hüppelink, kirjeldav tabeli struktuur ja kontrollitud kontrastisuhted.
+### Faili `docs/accessibility.md` kuju
+
+```text
+# Ülesanne 1 - semantiline märgend ja ligipääsetavus
+
+| paar                 | suhe    | AA (4,5:1) |
+|----------------------|---------|------------|
+| põhitekst valgel    | 17,40:1 | jah        |
+| abitekst valgel     |  7,72:1 | jah        |
+| fookuse ääris valgel|  5,98:1 | jah        |
+```
+
+### Mida automaatkontroll EI leia
+
+```text
+kas alt-tekst on ÕIGE - "pilt123.jpg" läbib kontrolli
+kas fookusjärjekord on LOOGILINE
+kas maamärkide jaotus on mõttekas
+kas aria-label on kasutajale arusaadav
+```
+
+Semantiline HTML, nähtav klaviatuurifookus, toimiv hüppelink, kirjeldav tabeli struktuur ja kontrollitud kontrastisuhted on esitatud koos mõõdetud tulemustega.

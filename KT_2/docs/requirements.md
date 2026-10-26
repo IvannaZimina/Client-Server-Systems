@@ -80,9 +80,24 @@ git commit -m "C02 Ex6 — Nõuded ja arhitektuuri valik"
 
 ## Oodatav tulemus
 
+### Faili `docs/requirements.md` kuju
+
 ```text
 kasutaja --< sündmus >-- toimumiskoht --< saaliplaan --< koht
-hoid: koht + ostja + aegumisaeg
+              |                                          |
+              +--< hinnaklass                            |
+              |                                          |
+              +--< ost --< pilet >-----------------------+
+                            |
+                            +--< sissepääs
+
+hoid: koht + ostja + aegumisaeg   (lühiajaline, aegub ise)
+
+| mudel         | kes hoiab andmeid | kes otsustab | siin          |
+|---------------|-------------------|--------------|---------------|
+| monoliit      | üks masin         | üks programm  | teine küsimus |
+| p2p           | igal osalejal     | igaüks        | EI SOBI       |
+| klient-server | server            | server        | sobib         |
 ```
 
 Keskne server hoiab piletite ja kohtade ühist olekut ning otsustab samaaegsete ostukatsete tulemuse.

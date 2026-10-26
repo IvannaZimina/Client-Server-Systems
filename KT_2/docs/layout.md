@@ -45,12 +45,12 @@ h1 { font-size: clamp(1.75rem, 1rem + 2.5vw, 3rem); }
 h2 { font-size: clamp(1.35rem, 0.8rem + 1.8vw, 2.2rem); }
 ```
 
-| ekraan | h1 | h2 |
-|---:|---:|---:|
-| 320 px | 28,0 px | 21,6 px |
-| 375 px | 28,0 px | 21,6 px |
-| 480 px | 28,0 px | 21,8 px |
-| 768 px | 35,2 px | 25,2 px |
+| ekraan  | h1      | h2     |
+|--------:|--------:|--------:|
+| 320 px  | 28,0 px | 21,6 px |
+| 375 px  | 28,0 px | 21,6 px |
+| 480 px  | 28,0 px | 21,8 px |
+| 768 px  | 35,2 px | 25,2 px |
 | 1024 px | 41,6 px | 28,3 px |
 | 1280 px | 48,0 px | 31,4 px |
 | 1440 px | 48,0 px | 32,0 px |
@@ -63,6 +63,25 @@ git add avalik/paigutus.css avalik/index.html docs/layout.md
 git commit -m "C02 Ex4 — Paigutus, ühikud ja responsiivsus"
 ```
 
-## Oodatav tulemus
+## Ülesanne 4 — Oodatav tulemus
+
+### Faili `docs/layout.md` tabel
+
+```css
+h1 { font-size: clamp(1.75rem, 1rem + 2.5vw, 3rem); }
+```
+
+| ekraan  | h1             | h2      |
+|--------:|---------------:|--------:|
+| 320 px  | 28,0 px (põhi) | 21,6 px (põhi) |
+| 375 px  | 28,0 px (põhi) | 21,6 px (põhi) |
+| 480 px  | 28,0 px (põhi) | 21,8 px |
+| 768 px  | 35,2 px        | 25,2 px |
+| 1024 px | 41,6 px        | 28,3 px |
+| 1280 px | 48,0 px (lagi) | 31,4 px |
+| 1440 px | 48,0 px (lagi) | 32,0 px (lagi) |
+| 1920 px | 48,0 px (lagi) | 32,0 px (lagi) |
+
+`h1` põhiväärtus kehtib kuni 480 px ja lagi alates 1280 px. Ühtki `@media`-rida ei ole selleks vaja.
 
 Paigutus kohandub ilma kaarte käsitsi ümber paigutamata, kasutab loogilisi omadusi, konteineripäringut, `subgrid`-i ja sujuvat `clamp()`-iga skaleerimist.
