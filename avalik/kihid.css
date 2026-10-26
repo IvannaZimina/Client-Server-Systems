@@ -1,0 +1,95 @@
+/* 1. Kuuluta viis kihti ühe reaga, enne ühtki reeglit. */
+@layer alused, raamistik, komponendid, meie, erand;
+
+/* 2. Pane žetoonid kihti alused: pinnad, tekst, jooned, röhk, samm ja raadius. */
+@layer alused {
+    :root {
+        --pinnad: #fffaf4;
+        --pind-teine: #f3eadf;
+        --tekst: #282421;
+        --jooned: #d6c9bd;
+        --rõhk: #9b4d32;
+        --fookus: #b96842;
+        --samm: 1rem;
+        --raadius: 8px;
+    }
+
+    /* 3. Tee tume teema kolmes astmes: :root, prefers-color-scheme, data-teema. */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --pinnad: #211f1d;
+            --pind-teine: #302b27;
+            --tekst: #f5eee7;
+            --jooned: #665950;
+            --rõhk: #e6a17e;
+            --fookus: #f0b18e;
+        }
+    }
+
+    :root[data-teema="hele"] {
+        --pinnad: #fffaf4;
+        --pind-teine: #f3eadf;
+        --tekst: #282421;
+        --jooned: #d6c9bd;
+        --rõhk: #9b4d32;
+        --fookus: #b96842;
+    }
+
+    :root[data-teema="tume"] {
+        --pinnad: #211f1d;
+        --pind-teine: #302b27;
+        --tekst: #f5eee7;
+        --jooned: #665950;
+        --rõhk: #e6a17e;
+        --fookus: #f0b18e;
+    }
+}
+
+/* 4. Lisa color-scheme, et ka kerimisribad ja väljad teemaga kaasa läheksid. */
+@layer alused {
+    :root {
+        color-scheme: light dark;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            color-scheme: dark;
+        }
+    }
+
+    :root[data-teema="hele"] {
+        color-scheme: light;
+    }
+
+    :root[data-teema="tume"] {
+        color-scheme: dark;
+    }
+}
+
+/* 6. Pane sama .valja reegel kihtidesse raamistik ja meie; vaata, kumb võidab. */
+@layer raamistik {
+    .valja {
+        background: var(--pind-teine);
+    }
+}
+
+@layer meie {
+    .valja {
+        border-radius: var(--raadius);
+    }
+}
+
+/* 7. Kasuta :where() lähtestuseks ja :is() rühmitamiseks — arvuta mõlema hind. */
+@layer komponendid {
+
+    /* :where() всегда имеет специфичность 0-0-0, независимо от селекторов внутри */
+    :where(h1, h2, h3) {
+        margin: 0;
+        font-weight: normal;
+    }
+
+    /* :is() принимает наибольшую специфичность среди своих аргументов (для h2, h3 это 0-0-1) */
+    :is(h2, h3) {
+        color: var(--tekst);
+    }
+}
