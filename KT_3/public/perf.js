@@ -57,8 +57,8 @@ export function runCollectionTests() {
     }
     const liveCol = liveBox.getElementsByClassName("test-node"); // Live collection
     let liveRemoved = 0;
-    while (liveCol.length > 0) {
-        liveBox.removeChild(liveCol[0]);
+    for (let i = 0; i < liveCol.length; i++) {
+        liveBox.removeChild(liveCol[i]);
         liveRemoved++;
     }
     console.log(
