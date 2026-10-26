@@ -10,6 +10,8 @@ Piletikassa võimaldab kasutajal sündmusi sirvida, valida piletid ja vormistada
 2. koha või pileti valimine ja ostu vormistamine;
 3. makse ning pileti hilisem valideerimine ilma sama koha topeltmüügita.
 
+---
+
 ### 2. Kirjelda kolm rolli ja ütle, milline neist EI OLE konto liik.
 
 * `kasutaja` on globaalne ostja;
@@ -17,6 +19,8 @@ Piletikassa võimaldab kasutajal sündmusi sirvida, valida piletid ja vormistada
 * `süsteemihaldur` haldab globaalselt toimumiskohti ja saaliplaane.
 
 Korraldaja ei ole eraldi konto liik. See on sündmusega seotud roll: sama inimene võib olla ühe sündmuse korraldaja ja teise sündmuse ostja.
+
+---
 
 ### 3. Järjesta funktsioonid tähtsuse järgi ja põhjenda esimest nelja.
 
@@ -30,6 +34,8 @@ Korraldaja ei ole eraldi konto liik. See on sündmusega seotud roll: sama inimen
 
 Esimesed neli moodustavad kasutajateekonna: tule, vali, maksa, sisene.
 
+---
+
 ### 4. Joonista andmete üldpilt: olemid ja seosed, ilma veergudeta.
 
 ```text
@@ -41,10 +47,13 @@ kasutaja --< sündmus >-- toimumiskoht --< saaliplaan --< koht
 
 hoid: koht + ostja + aegumisaeg
 ```
+---
 
 ### 5. VIHJE: esimesed neli funktsiooni on ÜKS lugu — tule, vali, maksa, sisene.
 
 Funktsioonide järjestus järgib sama kasutajateekonda: sündmuse leidmine, pileti valimine, ostu kinnitamine ja pileti kontrollimine.
+
+---
 
 ### 6. Võrdle kolme mudelit: kes hoiab andmeid ja kes otsustab.
 
@@ -54,13 +63,19 @@ Funktsioonide järjestus järgib sama kasutajateekonda: sündmuse leidmine, pile
 | P2P | iga osaleja | iga sõlm | ei sobi piletite ühise oleku jaoks |
 | klient-server | keskne server | server | sobib |
 
+---
+
 ### 7. Näita, MILLINE nõue sunnib klient-serverit — nimeta ta.
 
 Klient-serveri arhitektuuri sunnib valima nõue **vältida sama istekoha topeltmüüki**. Keskne server peab hoidma ühte tõeallikat ja lahendama samaaegsed ostukatsed.
 
+---
+
 ### 8. Ütle, millal P2P oleks õige valik, ja miks siin ei ole.
 
 P2P sobib näiteks failijagamiseks või detsentraliseeritud suhtluseks, kus keskne otsustaja puudub. Piletikassas ei sobi see, sest sama koha müük peab saama ühe keskse ja usaldusväärse otsuse.
+
+---
 
 ### 9. Loetle, mida kaasaegne CSS selles kontrolltöös JavaScripti asemel tegi.
 
@@ -71,12 +86,7 @@ P2P sobib näiteks failijagamiseks või detsentraliseeritud suhtluseks, kus kesk
 * `@container` kohandas komponendi paigutust;
 * `content-visibility` vähendas suure nimekirja renderdamise tööd.
 
-### 10. KOMMIT: `git commit -m "C02 Ex6 — Nõuded ja arhitektuuri valik"`.
-
-```bash
-git add docs/requirements.md
-git commit -m "C02 Ex6 — Nõuded ja arhitektuuri valik"
-```
+---
 
 ## Oodatav tulemus
 
