@@ -2,7 +2,7 @@
 
 ### 1. Käivita ette antud server ja ava katsetusala pordil 3004.
 
-Käivitati õpetaja antud server kaustast `materials` käsuga `node server.js`.
+Käivitati antud server kaustast `materials` käsuga `node server.js`.
 Katsetusala avati aadressil `http://localhost:3004`. Sama server töötab ka
 pordil `3005` päritolu ja CORS-i katsetamiseks.
 
