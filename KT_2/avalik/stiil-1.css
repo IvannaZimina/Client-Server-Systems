@@ -197,6 +197,10 @@ thead th {
   background: var(--pind-teine, #f3eadf);
 }
 
+.kaardid-grid > li {
+  min-inline-size: 0;
+}
+
 .sundmuse-sisu {
   padding: 1.25rem;
 }

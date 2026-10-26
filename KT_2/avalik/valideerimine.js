@@ -3,7 +3,7 @@ export function teade(vali) {
     const v = vali.validity;
 
     if (v.valueMissing) {
-        return "See vali on kohustuslik.";
+        return "See väli on kohustuslik.";
     }
     if (v.typeMismatch || v.patternMismatch) {
         if (vali.type === "email") return "Kontrolli e-posti aadressi kuju.";

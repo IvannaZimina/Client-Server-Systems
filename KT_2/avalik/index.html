@@ -15,7 +15,7 @@
     <a href="#main" class="hyppa">Hüppa põhisisu juurde</a>
 
     <header role="banner">
-        <h1 class="logo">Piletikassa</h1>
+        <h1 id="page-title" class="logo">Piletikassa</h1>
         <nav aria-label="Peamenüü">
             <ul>
                 <li><a href="index.html" aria-current="page">Avaleht</a></li>
@@ -28,7 +28,7 @@
         </button>
     </header>
 
-    <main id="main">
+    <main id="main" aria-labelledby="page-title">
 
         <section class="ylevaade" aria-labelledby="sec-tabel">
             <div class="jaotis-pealkiri">
@@ -62,7 +62,7 @@
             </table>
         </section>
 
-        <section class="esiletostetud" aria-labelledby="sec-kaardid">
+        <section class="esiletostetud kaardid-konteiner" aria-labelledby="sec-kaardid">
             <div class="jaotis-pealkiri">
                 <span class="jaotis-ikoon" aria-hidden="true">▣</span>
                 <div>
@@ -71,17 +71,21 @@
                 </div>
             </div>
 
-            <article class="sundmuse-kaart">
-                <div class="sundmuse-sisu">
-                    <p class="silt">Soovitus</p>
-                    <h3><a href="ost.html">Arendajate hommik</a></h3>
-                    <p>Kolm ettekannet, hea seltskond ja hommikukohv Delta keskuses.</p>
-                    <p class="meta"><time datetime="2026-09-13T09:30">13. sept 9.30</time> · Delta</p>
-                    <a class="toimingu-link" href="ost.html">Vaata rohkem <span aria-hidden="true">→</span></a>
-                </div>
-                <img src="pildid/muster.svg" width="640" height="360" loading="lazy" decoding="async"
-                    alt="Abstraktne muster Arendajate hommiku sündmusekaardil">
-            </article>
+            <ul class="kaardid-grid">
+                <li>
+                    <article class="kaart sundmuse-kaart">
+                        <div class="sundmuse-sisu">
+                            <p class="silt">Soovitus</p>
+                            <h3><a href="ost.html">Arendajate hommik</a></h3>
+                            <p>Kolm ettekannet, hea seltskond ja hommikukohv Delta keskuses.</p>
+                            <p class="meta"><time datetime="2026-09-13T09:30">13. sept 9.30</time> · Delta</p>
+                            <a class="toimingu-link" href="ost.html">Vaata rohkem <span aria-hidden="true">→</span></a>
+                        </div>
+                        <img src="pildid/muster.svg" width="640" height="360" loading="lazy" decoding="async"
+                            alt="Abstraktne muster Arendajate hommiku sündmusekaardil">
+                    </article>
+                </li>
+            </ul>
         </section>
 
     </main>

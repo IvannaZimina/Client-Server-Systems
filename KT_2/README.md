@@ -33,7 +33,7 @@ Open either page through VS Code Live Server or another local static web server.
 - Provides accessible descriptions and persistent error containers for form fields.
 - Uses responsive contrast-aware colors and meaningful alternative text for the event image.
 
-Details: [`docs/ligipaasetavus.md`](docs/ligipaasetavus.md)
+Details: [`docs/accessibility.md`](docs/accessibility.md)
 
 ### Assignment 2 - Purchase form and validation
 
@@ -47,7 +47,7 @@ The form demonstrates native HTML constraints and custom JavaScript validation:
 - custom messages based on `ValidityState`;
 - `aria-invalid` updates and focus on the first invalid field after submit.
 
-Implementation: [`avalik/valideerimine.js`](avalik/valideerimine.js)
+Implementation: [`avalik/valideerimine.js`](avalik/valideerimine.js). Report: [`docs/purchase-form.md`](docs/purchase-form.md)
 
 ### Assignment 3 - Cascade, layers, and design tokens
 
@@ -55,7 +55,7 @@ Implementation: [`avalik/valideerimine.js`](avalik/valideerimine.js)
 
 The project uses CSS custom properties for surfaces, text, borders, accents, spacing, and radius. The neutral form border replaces the previous strong blue frame. The documentation also explains specificity, `:where()`, `:is()`, and cascade layer precedence.
 
-Details: [`docs/kaskaad.md`](docs/kaskaad.md)
+Details: [`docs/cascade.md`](docs/cascade.md)
 
 ### Assignment 4 - Layout, units, and responsiveness
 
@@ -68,7 +68,7 @@ The interface uses:
 - a one-column card layout on narrow screens;
 - a responsive event table without horizontal page overflow.
 
-Details: [`docs/paigutus.md`](docs/paigutus.md)
+Details: [`docs/layout.md`](docs/layout.md)
 
 ### Assignment 5 - Bootstrap and CSS performance
 
@@ -87,7 +87,7 @@ The ticket shop is analysed as a client-server system. A central server is requi
 - coordinating simultaneous purchase attempts;
 - protecting payment and booking state.
 
-The requirements, roles, entities, priorities, and architecture comparison are documented in [`docs/nouded.md`](docs/nouded.md).
+The requirements, roles, entities, priorities, and architecture comparison are documented in [`docs/requirements.md`](docs/requirements.md).
 
 ## Theme Switching
 
@@ -118,8 +118,12 @@ KT_2/
 │   ├── bootstrap.md
 │   ├── kaskaad.md
 │   ├── ligipaasetavus.md
-│   ├── noudeed.md
-│   └── paigutus.md
+│   ├── accessibility.md
+│   ├── cascade.md
+│   ├── layout.md
+│   ├── purchase-form.md
+│   ├── requirements.md
+│   └── bootstrap.md
 └── README.md
 ```
 

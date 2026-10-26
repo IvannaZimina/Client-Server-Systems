@@ -38,6 +38,9 @@ p {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     gap: var(--samm);
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 /* 7. Kasuta subgridit, et kaardid read joonduksid kaartide VAHEL. */
@@ -47,13 +50,13 @@ p {
     grid-row: span 3;
 }
 
-/* 8. Anna kaardile container-type ja kirjuta talle @container reegel. */
-.kaart {
+/* 8. Anna container-type ümbrisele, mitte kaardile endale. */
+.kaardid-konteiner {
     container-type: inline-size;
 }
 
 @container (min-width: 30rem) {
-    .kaart {
+    .sundmuse-kaart {
         padding: 2rem;
     }
 }

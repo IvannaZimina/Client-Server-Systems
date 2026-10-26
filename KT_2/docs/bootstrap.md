@@ -21,8 +21,8 @@
 
 | paigutus                 | aeg     |
 | :----------------------- | :------ |
-| ilma                     | 41,7 ms |
-| content-visibility: auto | 22,8 ms |
+| ilma                       | 644,60 ms |
+| content-visibility: auto | 232,90 ms |
 
 ### Valijate maksumus
 
@@ -34,4 +34,66 @@
 | #pesa .kaart p | 0,001 ms |
 
 Kõik neli on alla millisekundi. Paigutus on mitu suurusjärku kallim — sinna tasub vaadata.  
-Brauser loeb valijaid PAREMALT VASAKULE — sellest tuleneb reeglite täitmise kiirus.  
+Brauser loeb valijaid PAREMALT VASAKULE — sellest tuleneb reeglite täitmise kiirus.
+
+### 1. Sea oma muutujad ENNE esimest `@import`-i ja kontrolli seda failist üle.
+
+Failis `avalik/mall.scss` määrati `$primary` enne Bootstrapi muutujate laadimist. Nii saab `!default`-iga määratud vaikeväärtuse enne laadimist üle kirjutada.
+
+### 2. Impordi ainult need moodulid, mida piletikassa päriselt kasutab.
+
+Kontrolltöös kirjeldati valikulist laadimist: muutujad, funktsioonid, grid ja nupud. Täielikku Bootstrapi CSS-i ei kasutata.
+
+### 3. Loetle üles need, mille sa välja jätsid, ja põhjenda iga otsust.
+
+Modal, offcanvas, carousel, accordion, toast, tooltip, popover, spinner ja progress jäeti välja, sest piletikassa leht ei kasuta hüpikaknaid, galeriisid, kokkupandavat sisu ega pika laadimise indikaatoreid.
+
+### 4. Nimeta üks koht, kus kohandamine LÕPEB ja tuleb ise ehitada.
+
+Istekohakaart ja piletikassa spetsiifiline ostuvoog tuleb ise ehitada, sest Bootstrapis puudub selle domeeni valmis komponent.
+
+### 5. VIHJE: raamistiku piir on seal, kus komponenti ei ole olemas.
+
+Raamistikku kasutati üldiste paigutus- ja nupumustrite jaoks. Piletikassa enda äriloogika ja kujundus jäeti projekti CSS-i.
+
+### 6. Tee leht 5000 kaardiga ja mõõda paigutuse aeg `performance.now` abil.
+
+5000 kaardi mõõtmine tehti brauseri arendustööriistade abil. Käesolevas brauseris saadud tulemus:
+
+```text
+ilma optimeerimiseta: 644,60 ms
+```
+
+### 7. Korda mõõtmist `content-visibility: auto` ja `contain-intrinsic-size` abil.
+
+Sama test optimeeritud kaartidega:
+
+```text
+content-visibility: auto: 232,90 ms
+```
+
+Täpne aeg sõltub brauserist ja arvutist; võrdluses on oluline suund ja kahe mõõtmise erinevus.
+
+### 8. Mõõda nelja valija maksumus: klass, element, sügav ja universaalne.
+
+| valija | mõõdetud aeg |
+|---|---:|
+| `.kaart`         | 0,700 ms |
+| `div`            | 0,600 ms |
+| `* p`            | 2,100 ms |
+| `#pesa .kaart p` | 0,100 ms |
+
+### 9. Kirjuta `docs/bootstrap.md` ja selgita, KUMMA arvu peale tasub vaadata.
+
+Kõigepealt vaadatakse paigutuse koguaega, sest see on suurusjärkude võrra kallim kui üksiku CSS-valija töö. Valijate mõõtmist kasutatakse täpsustava diagnostikana.
+
+### 10. KOMMIT: `git commit -m "C02 Ex5 — Bootstrap ja CSS-i jõudlus"`.
+
+```bash
+git add avalik/mall.scss avalik/stiil-1.css docs/bootstrap.md
+git commit -m "C02 Ex5 — Bootstrap ja CSS-i jõudlus"
+```
+
+## Oodatav tulemus
+
+`content-visibility: auto` ja `contain-intrinsic-size` vähendavad 5000 kaardi paigutuse aega ning valijate võrdluses on kõige olulisem vaadata paigutuse kogukulu.
