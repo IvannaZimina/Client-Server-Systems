@@ -101,24 +101,25 @@ The theme button is available on both pages. [`avalik/teema.js`](avalik/teema.js
 ## Project Structure
 
 ```text
-.
+KT_2/
 ├── avalik/
+│   ├── pildid/
+│   │   └── muster.svg
 │   ├── index.html
 │   ├── ost.html
 │   ├── kihid.css
+│   ├── mall.scss
 │   ├── paigutus.css
 │   ├── stiil-1.css
 │   ├── stiil-2.css
 │   ├── teema.js
-│   ├── valideerimine.js
-│   └── pildid/
+│   └── valideerimine.js
 ├── docs/
 │   ├── bootstrap.md
 │   ├── kaskaad.md
 │   ├── ligipaasetavus.md
-│   ├── nouded.md
+│   ├── noudeed.md
 │   └── paigutus.md
-├── pildid/
 └── README.md
 ```
 
