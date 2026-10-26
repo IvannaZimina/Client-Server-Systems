@@ -1,6 +1,6 @@
 # Ülesanne 3 - DOM kui puu: olek -> vaade
 
-### 1. Ühe olekuobjekti loomine
+### 1. Loo olek ÜHE objektina: `events`, `sort`, `dir`, `search`, `loading`.
 
 * Olek koondati üheks objektiks, mis sisaldab välju `events`, `sort`, `dir`, `search` ja `loading`:
 
@@ -18,7 +18,7 @@
 
 ---
 
-### 2. `forView(state)` nime järgi filtreerimine ja sortimine
+### 2. Kirjuta `forView(state)`: otsi nime JA koha pealt, siis sordi.
 
 * Funktsioonis `forView` luuakse sündmustest koopia ning rakendatakse otsingut nime ja toimumiskoha järgi. Otsingutekst teisendatakse väiketähtedeks ning vaste leidmisel jäetakse sündmus tulemusse.
 
@@ -35,7 +35,7 @@
 
 ---
 
-### 3. Kahe võtme tagastamine: `rows` ja `state`
+### 3. Tagasta tuletisest KAKS asja: `rows` ja `state`.
 
 * Funktsioon `forView` tagastab objekti kahe võtmega:
 
@@ -50,7 +50,7 @@
 
 ---
 
-### 4. Olekust tuletatud vaate kasutamine
+### 4. Joonista EI TOHI olekusse vaadata — muidu on üks suund lõhki läinud.
 
 * Vaate koostamisel kasutatakse funktsiooni `forView(readState())`. DOM-i renderdamine toimub saadud `rows`-i põhjal ning renderdusfunktsioon ei pöördu otse globaalse oleku poole.
 
@@ -64,7 +64,7 @@
 
 ---
 
-### 5. Tühi tulemus ja laadimise olek
+### 5. VIHJE: tühi tulemus ja laadimine näevad DOM-is ühtemoodi välja.
 
 * Filtreerimise tulemusena võib tekkida tühi `rows`-massiiv. Selline tulemus on korrektne ning seda saab DOM-is käsitleda ühtse renderdusloogikaga.
 
@@ -72,7 +72,7 @@
 
 ---
 
-### 6. 2000 rea renderdamise võrdlus
+### 6. Mõõda 2000 rida kolmel viisil: tsükkel, `replaceChildren` ja fragment.
 
 * Failis `perf.js` võrreldakse 2000 elemendi loomist kolmel viisil:
 
@@ -92,28 +92,28 @@
 
 ---
 
-### 7. Elava kollektsiooni muutumine eemaldamise ajal
+### 7. Tee kümme elementi ja eemalda need tsüklis ELAVAST kollektsioonist.
 
 * `getElementsByClassName` tagastab elava kollektsiooni. Kollektsiooni sisu muutub kohe pärast elemendi DOM-ist eemaldamist.
 
-  Praeguses `runCollectionTests`-i koodis kasutatakse tingimusega `while`-tsüklit:
+  Praeguses `runCollectionTests`-i koodis kasutatakse indeksiga `for`-tsüklit:
 
   ```javascript
-  while (liveCol.length > 0) {
-    liveBox.removeChild(liveCol[0]);
+  for (let i = 0; i < liveCol.length; i++) {
+    liveBox.removeChild(liveCol[i]);
     liveRemoved++;
   }
   ```
 
-  Selle lahenduse korral eemaldatakse kõik 10 elementi ja alles jääb 0 elementi:
+  Elav kollektsioon lüheneb iga eemaldamise järel. Seetõttu liigutakse järgmise indeksi juurde ja iga teine element jääb alles:
 
   | Kollektsioon | Eemaldati | Jäi alles |
   | --- | ---: | ---: |
-  | elav `getElementsByClassName` | 10 | 0 |
+  | elav `getElementsByClassName` | 5 | 5 |
 
 ---
 
-### 8. Staatilise kollektsiooni võrdlus
+### 8. Korda sama STAATILISE kollektsiooniga ja võrdle, mitu jäi alles.
 
 * `querySelectorAll` tagastab staatilise kollektsiooni. Kollektsiooni liikmed säilivad pärast DOM-ist eemaldamist kollektsioonis ning `forEach` saab kõik algselt leitud 10 elementi läbi käia.
 
@@ -132,11 +132,9 @@
 
   DOM-ist eemaldatud elemendid ei kuulu enam `staticBox`-i, kuid staatiline nimekiri säilitab algse valiku.
 
-  Kui elavast kollektsioonist eemaldataks elemendid indeksiga `for (let i = 0; i < collection.length; i++)`, lüheneks kollektsioon tsükli ajal ja iga teine element jääks eemaldamata. Sellise variandi tulemus oleks 5 eemaldatud ja 5 alles.
+--- 
 
----
-
-### 9. `docs/view.md`: olek, vaade ja mõõtmistulemused
+### 9. Kirjuta `docs/view.md` koos mõõdetud millisekunditega.
 
 * Käesolevas failis dokumenteeriti:
 
@@ -147,7 +145,7 @@
   - ühesuunaline voog olekust DOM-i;
   - 2000 rea renderdamise kolm meetodit;
   - elava ja staatilise kollektsiooni erinevus;
-  - `while`-tsükli tegelik tulemus ning indeksiga tsükli võimalik vahelejätmise efekt.
+  - indeksiga tsükli tegelik tulemus elava kollektsiooni korral.
 
 ---
 
@@ -183,8 +181,8 @@ snapshot.search // "rock"
 ### DOM-i kollektsioonid
 
 ```text
-getElementsByClassName + while:
-removed: 10, remaining: 0
+getElementsByClassName + indexed for:
+removed: 5, remaining: 5
 
 querySelectorAll + forEach:
 removed: 10, collection length: 10
