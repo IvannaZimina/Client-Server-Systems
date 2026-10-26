@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="et">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piletikassa - Sündmused</title>
+    <link rel="stylesheet" href="stiil-1.css">
+    <link rel="stylesheet" href="kihid.css">
+    <link rel="stylesheet" href="paigutus.css">
+</head>
+
+<body>
+
+    <a href="#main" class="hyppa">Hüppa põhisisu juurde</a>
+
+    <header role="banner">
+        <h1 class="logo">Piletikassa</h1>
+        <nav aria-label="Peamenüü">
+            <ul>
+                <li><a href="index.html" aria-current="page">Avaleht</a></li>
+                <li><a href="#sec-kaardid">Sündmused</a></li>
+                <li><a href="mailto:info@piletikassa.test">Kontakt</a></li>
+            </ul>
+        </nav>
+        <button class="teema-luliti" type="button" data-teema-luliti aria-pressed="false">
+            Kasuta tumedat teemat
+        </button>
+    </header>
+
+    <main id="main">
+
+        <section class="ylevaade" aria-labelledby="sec-tabel">
+            <div class="jaotis-pealkiri">
+                <span class="jaotis-ikoon" aria-hidden="true">▣</span>
+                <div>
+                    <h2 id="sec-tabel">Sündmuste võrdlus</h2>
+                    <p>Piletite ja aegade võrdlus</p>
+                </div>
+            </div>
+            <table class="sundmuste-tabel">
+                <caption class="visuaalselt-peidetud">Piletite ja aegade võrdlus</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Üritus</th>
+                        <th scope="col">Koht</th>
+                        <th scope="col">Hind alates</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row"><a href="ost.html">Arendajate hommik</a></th>
+                        <td>Delta</td>
+                        <td>10 €</td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="ost.html">Kultuuriöö</a></th>
+                        <td>Aparaaditehas</td>
+                        <td>15 €</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="esiletostetud" aria-labelledby="sec-kaardid">
+            <div class="jaotis-pealkiri">
+                <span class="jaotis-ikoon" aria-hidden="true">▣</span>
+                <div>
+                    <h2 id="sec-kaardid">Esiletõstetud sündmused</h2>
+                    <p>Leia endale järgmine hea põhjus kodust välja tulla.</p>
+                </div>
+            </div>
+
+            <article class="sundmuse-kaart">
+                <div class="sundmuse-sisu">
+                    <p class="silt">Soovitus</p>
+                    <h3><a href="ost.html">Arendajate hommik</a></h3>
+                    <p>Kolm ettekannet, hea seltskond ja hommikukohv Delta keskuses.</p>
+                    <p class="meta"><time datetime="2026-09-13T09:30">13. sept 9.30</time> · Delta</p>
+                    <a class="toimingu-link" href="ost.html">Vaata rohkem <span aria-hidden="true">→</span></a>
+                </div>
+                <img src="pildid/muster.svg" width="640" height="360" loading="lazy" decoding="async"
+                    alt="Abstraktne muster Arendajate hommiku sündmusekaardil">
+            </article>
+        </section>
+
+    </main>
+
+    <footer role="contentinfo">
+        <p>&copy; 2026 Piletikassa</p>
+    </footer>
+
+    <script type="module" src="teema.js"></script>
+</body>
+
+</html>
