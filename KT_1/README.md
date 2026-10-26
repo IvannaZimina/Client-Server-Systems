@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# Klient-server-s-steemid
-Kontroltööd
-=======
 # Sulgpalliklubi — Klient-server süsteemid
 
 Praktikumide ja kontrolltööde repositoorium kursuse "Klient-server süsteemid" raames.
@@ -69,4 +65,3 @@ Repository for practical assignments and projects for the "Client-Server Systems
 ### Task 5: Club Homepage and Search Form
 * **Description:** Built a semantic HTML5 homepage for the badminton club with embedded CSS, including a schedule table and a search form (tested with GET and POST methods, proper field types, labels, and name attributes). Form behavior was tested and documented.
 * **Files:** `index.html`, `vastus.txt`
->>>>>>> old-repo-1/main
