@@ -1,0 +1,7 @@
+# Ignore instructor's materials folder
+materials/
+
+# System files & dependencies (standard best practice)
+node_modules/
+.DS_Store
+.vscode/

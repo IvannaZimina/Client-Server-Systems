@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="et">
+
+<head>
+    <meta charset="UTF-8">
+    <title>C03 Test - Tasks 1, 2 & 3</title>
+    <!-- Подключаем отдельный файл стилей -->
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <h1>Klient-server C03 — Test Results</h1>
+
+    <!-- Task 1 Section -->
+    <div class="section">
+        <h2>Ülesanne 1 — Keel, ulatus ja silumine</h2>
+        <div class="result-item"><span class="label">freeText(0):</span> <span id="res-freetext"></span></div>
+        <div class="result-item"><span class="label">price('vip'):</span> <span id="res-price"></span></div>
+        <div class="result-item"><span class="label">withVat(100):</span> <span id="res-vat"></span></div>
+    </div>
+
+    <!-- Task 2 Section -->
+    <div class="section">
+        <h2>Ülesanne 2 — Massiivid ja objektid</h2>
+        <div class="result-item"><span class="label">allSoldOut([]):</span> <span id="res-soldout"></span></div>
+        <div class="result-item"><span class="label">seatsText({seats: 0}):</span> <span id="res-seatstext"></span>
+        </div>
+        <div class="result-item"><span class="label">organizerName:</span> <span id="res-org"></span></div>
+    </div>
+
+    <!-- Task 3 Section: DOM, State & View -->
+    <div class="section">
+        <h2>Ülesanne 3 — DOM: Olek ja vaade</h2>
+        <div style="margin-bottom: 1rem;">
+            <input type="text" id="search-input" class="form-control"
+                placeholder="Otsi sündmust nime või koha järgi...">
+        </div>
+        <ul id="event-list" class="event-list">
+        </ul>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+</body>
+
+</html>
