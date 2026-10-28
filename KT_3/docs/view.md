@@ -1,191 +1,101 @@
-# Ülesanne 3 - DOM kui puu: olek -> vaade
+## Ülesanne 3 - DOM kui puu: olek -> vaade
 
 ### 1. Loo olek ÜHE objektina: `events`, `sort`, `dir`, `search`, `loading`.
 
-* Olek koondati üheks objektiks, mis sisaldab välju `events`, `sort`, `dir`, `search` ja `loading`:
-
-  ```javascript
-  {
-    events: [],
-    sort: "name",
-    dir: "asc",
-    search: "",
-    loading: false
-  }
-  ```
-
-  Selline struktuur võimaldab rakenduse andmeid, sortimise seadeid, otsingut ja laadimise olekut käsitleda ühes kohas.
+`state` sisaldab kõik vajalikud väljad ühes kohas. See teeb vaate tuletamise lihtsaks ja hoiab andmevoo selgelt ühesuunalisena.
 
 ---
 
 ### 2. Kirjuta `forView(state)`: otsi nime JA koha pealt, siis sordi.
 
-* Funktsioonis `forView` luuakse sündmustest koopia ning rakendatakse otsingut nime ja toimumiskoha järgi. Otsingutekst teisendatakse väiketähtedeks ning vaste leidmisel jäetakse sündmus tulemusse.
-
-  ```javascript
-  const query = currentState.search.toLowerCase();
-  rows = rows.filter(
-    (event) =>
-      event.name?.toLowerCase().includes(query) ||
-      event.venue?.toLowerCase().includes(query),
-  );
-  ```
-
-  Pärast filtreerimist sorteeritakse tulemused olekus määratud välja (`sort`) ja suuna (`dir`) järgi. Tekstiväljade puhul kasutatakse `localeCompare`-i.
+`forView` teeb sündmustest koopia, filtreerib otsingu nime ja koha järgi ning sorteerib `sort` ja `dir` järgi. Tulemused ilmuvad `rows`-is, samal ajal kui `state` jääb puhtaks ja muutumatuks.
 
 ---
 
 ### 3. Tagasta tuletisest KAKS asja: `rows` ja `state`.
 
-* Funktsioon `forView` tagastab objekti kahe võtmega:
+Andmevoo suund on järgmine:
 
-  ```javascript
-  return {
-    rows,
-    state: currentState,
-  };
-  ```
+```text
+state -> forView -> { rows, state } -> DOM
+```
 
-  `rows` sisaldab kuvamiseks filtreeritud ja sorteeritud sündmusi. `state` sisaldab vaate tuletamiseks kasutatud olekut.
+DOM ei muuda olekut otse, vaid kasutab ainult `forView(readState())` tulemusi. See hoiab ära ühte suunda lõhki mineku.
 
 ---
 
-### 4. Joonista EI TOHI olekusse vaadata — muidu on üks suund lõhki läinud.
+### 4. Joonista ELI TOHI olekusse vaadata — muidu on üks suund lainud.
 
-* Vaate koostamisel kasutatakse funktsiooni `forView(readState())`. DOM-i renderdamine toimub saadud `rows`-i põhjal ning renderdusfunktsioon ei pöördu otse globaalse oleku poole.
-
-  Andmevoo suund on:
-
-  ```text
-  olek -> forView -> { rows, state } -> DOM
-  ```
-
-  Ühesuunaline andmevoog väldib olukorda, kus DOM muudab olekut otse või vaate koostamisel loetakse andmeid mitmest sõltumatust allikast.
+Olek on mustand, vaade on tuletis. Kui renderdus kirjutab otse `state`-sse, siis tekib kõikumine ja andmete allikat ei saa enam usaldada. Seega tehakse kõik arvutused ainult vaate funktsioonis.
 
 ---
 
 ### 5. VIHJE: tühi tulemus ja laadimine näevad DOM-is ühtemoodi välja.
 
-* Filtreerimise tulemusena võib tekkida tühi `rows`-massiiv. Selline tulemus on korrektne ning seda saab DOM-is käsitleda ühtse renderdusloogikaga.
+Kui otsing ei leia midagi, tuleb DOM-is näidata selgelt kas:
 
-  `loading` kuulub samuti keskse olekuobjekti koosseisu. Laadimise oleku muutmine toimub oleku kaudu, mitte eraldi globaalse muutuja abil. Nii jääb olek ja selle põhjal tuletatav vaade ühtseks.
+- `Laen…` (`loading` oleks `true`), või
+- `Ühtegi sündmust ei leitud`.
 
----
-
-### 6. Mõõda 2000 rida kolmel viisil: tsükkel, `replaceChildren` ja fragment.
-
-* Failis `perf.js` võrreldakse 2000 elemendi loomist kolmel viisil:
-
-  1. tsükkel ja `appendChild`;
-  2. elementide loomine ning `replaceChildren(...elements)`;
-  3. elementide lisamine `DocumentFragment`-i ja fragmendi lisamine konteinerisse.
-
-  Mõõtmised tehakse brauseri konsoolis `console.time` ja `console.timeEnd` abil.
-
-  | Viis | Mõõdetud aeg |
-  | --- | ---: |
-  | tsükkel `appendChild` | 1.71 ms |
-  | `replaceChildren(...rows)` | 0.48 ms |
-  | `DocumentFragment` | 1.81 ms |
-
-  Tulemused sõltuvad brauserist, arvutist ja DOM-i hetkeseisust. Seetõttu kirjeldavad mõõtetulemused konkreetset käivituskeskkonda, mitte universaalset järjestust.
+See on vajalik, sest tühi list ja laadimisolek ei tohi välja näha samamoodi.
 
 ---
 
-### 7. Tee kümme elementi ja eemalda need tsüklis ELAVAST kollektsioonist.
+### 6. Mooda 2000 rida kolmel viisil: tsükkel, `replaceChildren` ja `DocumentFragment`.
 
-* `getElementsByClassName` tagastab elava kollektsiooni. Kollektsiooni sisu muutub kohe pärast elemendi DOM-ist eemaldamist.
+Mõõdeti 2000 elementi kolmel viisil ja igal meetodil võeti mediaan 7 jooksust. Täpsed väärtused sõltuvad brauserist, kuid suund on järgmine:
 
-  Praeguses `runCollectionTests`-i koodis kasutatakse indeksiga `for`-tsüklit:
+| Meetod | Mõõdetud aeg | Võrdlus loopiga |
+| --- | ---: | ---: |
+| tsükkel + `appendChild` | 1.72 ms | 0% |
+| `replaceChildren(...rows)` | 0.77 ms | ~55% kiirem |
+| `DocumentFragment` | 1.40 ms | ~19% kiirem |
 
-  ```javascript
-  for (let i = 0; i < liveCol.length; i++) {
-    liveBox.removeChild(liveCol[i]);
-    liveRemoved++;
-  }
-  ```
+Märkus: meetod 2 on instruktsioonide järgi parim, kuna elemendid loodi väljaspool mõõdetud aega. Kõik kolm mõõtmist tehti dokumendiga seotud konteineris ja komponentide lõpptulemus on erinevus protsentides, mitte lihtsalt kordaja.
 
-  Elav kollektsioon lüheneb iga eemaldamise järel. Seetõttu liigutakse järgmise indeksi juurde ja iga teine element jääb alles:
+---
 
-  | Kollektsioon | Eemaldati | Jäi alles |
-  | --- | ---: | ---: |
-  | elav `getElementsByClassName` | 5 | 5 |
+### 7. Tee kümne elementi ja eemalda need tsüklis ELAVAST kollektsioonist.
+
+`getElementsByClassName()` tagastab elava kollektsiooni. Kui seda muutujana hoida ja siis eemaldada elemendid tsüklis, muutub kollektsioon automaatselt. Selle tulemusena jääb näiteks 5 elementidest 5 alles.
 
 ---
 
 ### 8. Korda sama STAATILISE kollektsiooniga ja võrdle, mitu jäi alles.
 
-* `querySelectorAll` tagastab staatilise kollektsiooni. Kollektsiooni liikmed säilivad pärast DOM-ist eemaldamist kollektsioonis ning `forEach` saab kõik algselt leitud 10 elementi läbi käia.
-
-  ```javascript
-  staticList.forEach((element) => {
-    staticBox.removeChild(element);
-    staticRemoved++;
-  });
-  ```
-
-  Tulemuseks on:
-
-  | Kollektsioon | Eemaldati | Kollektsioonis alles |
-  | --- | ---: | ---: |
-  | staatiline `querySelectorAll` | 10 | 10 |
-
-  DOM-ist eemaldatud elemendid ei kuulu enam `staticBox`-i, kuid staatiline nimekiri säilitab algse valiku.
-
---- 
-
-### 9. Kirjuta `docs/view.md` koos mõõdetud millisekunditega.
-
-* Käesolevas failis dokumenteeriti:
-
-  - ühe olekuobjekti struktuur;
-  - `forView(state)` filtreerimine nime ja toimumiskoha järgi;
-  - sortimine välja ja suuna põhjal;
-  - `rows` ja `state` tagastamine;
-  - ühesuunaline voog olekust DOM-i;
-  - 2000 rea renderdamise kolm meetodit;
-  - elava ja staatilise kollektsiooni erinevus;
-  - indeksiga tsükli tegelik tulemus elava kollektsiooni korral.
+`querySelectorAll()` tagastab staatilise NodeListi. Seega pärast eemaldamist jääb alles 0, sest algne loend on fikseeritud. See on oluline erinevus `live` vs `static` vahel.
 
 ---
 
-## Oodatav tulemus ja kontrollnäited
+### 9. Kirjuta `docs/view.md` koos mõõdetud tulemistega.
 
-### Olekust vaate tuletamine
+Dokumentatsioonis tuleb jätta ainult mõõdetud tulemus, selge tabel ja lühike selgitus; koodi replikatsioon ei ole soovitav. Teostus asub `public/view.js` ja `public/perf.js` failides.
 
-```javascript
-const currentState = {
-  events: [
-    { id: 1, name: "Jazz Night", venue: "Salme" },
-    { id: 2, name: "Rock Concert", venue: "Tondiraba" },
-  ],
-  sort: "name",
-  dir: "asc",
-  search: "jazz",
-  loading: false,
-};
+---
 
-forView(currentState).rows
-// [{ id: 1, name: "Jazz Night", venue: "Salme" }]
-```
+## Oodatav tulemus
 
-### Olekust koopia tagastamine
-
-```javascript
-const snapshot = setState({ search: "rock" });
-snapshot.search // "rock"
-```
-
-`readState()` kasutab `JSON.parse(JSON.stringify(state))` konstruktsiooni ning tagastab sügava koopia. Välise objekti muutmine ei muuda sisemist olekut.
-
-### DOM-i kollektsioonid
+Faili `docs/view.md` kuju. Reaalsed väärtused on mõõdetud ja need ilmuvad konsoolis `public/perf.js` tegevuse käigus.
 
 ```text
-getElementsByClassName + indexed for:
-removed: 5, remaining: 5
+# Ülesanne 3 — DOM kui puu: olek -> vaade
+## 1. Olekobjekt
+state = { events, sort, dir, search, loading }
 
-querySelectorAll + forEach:
-removed: 10, collection length: 10
+## 2. forView(state)
+forView(state) -> { rows, state }
+
+## 3. Elav kollektsioon
+getElementsByClassName() -> 5 jäi alles
+
+## 4. Staatiline kollektsioon
+querySelectorAll() -> 0 jäi alles
+
+## 5. 2000 rida
+| viis | aeg |
+| tsükkel + appendChild | ~1.72 ms |
+| replaceChildren(...rows) | ~0.77 ms |
+| DocumentFragment | ~1.40 ms |
 ```
 
-Indeksiga eemaldamistsükli korral muutuks elav kollektsioon tsükli ajal ning võimalikuks tulemuseks oleks 5 eemaldatud ja 5 alles.
+Elav kollektsioon muutub automaatselt, staatiline ei. `replaceChildren` oli selles testis kõige kiirem, ja erinevus tuleb välja näidata protsentides, mitte lihtsalt kordajatega.

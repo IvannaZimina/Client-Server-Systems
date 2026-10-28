@@ -1,182 +1,121 @@
-# Ülesanne 1 - keel, ulatus ja silumine
+## Ülesanne 1 — Keel, ulatus ja silumine
 
-### 1. `public/format.js` ja viis funktsiooni
+### 1. Loo `public/format.js` ja kirjuta viis funktsiooni `const`-vaikeluguga.
 
-* Faili lisati viis nõutud funktsiooni:
+Need viis funktsiooni on lahendatud `public/format.js` failis. Need on praktiliselt kasutatavad arvutused, kus iga funktsioon töötab kindla vaikimisi väärtusega:
 
-  - `freeText(free = 0)` vormistab vabade kohtade arvu;
-  - `price(tier = "standard", qty = 1, ...extras)` arvutab piletite hinna;
-  - `withVat(sum = 0, vatRate = 0.22)` lisab summale käibemaksu;
-  - `createCart()` loob sulundiga ostukorvi;
-  - `seatLabel(row = 1, nr = 1, separator = "-")` vormistab istekoha nimetuse.
+- `freeText(free = 0)` — kui sisend on `0`, tagastab `"välja müüdud"`; kui on positiivne arv, tagastab `"N vaba"`; muudel juhtudel `"vigane sisend"`.
+- `price(tier = "standard", qty = 1, ...extras)` — arvutab hinna hinnaklassi ja koguse järgi ning liidab lisakulud. Tundmatu hinnaklass viskab `RangeError`.
+- `withVat(sum = 0, vatRate = 0.22)` — lisab käibemaksu 22% defaultina.
+- `createCart()` — loob sulundiga objekti, kus `rows` on olemas ainult sisemuses.
+- `seatLabel(row = 1, nr = 1, separator = "-")` — vormindab koha märgistuse kujul `Rida X-Nr Y`.
 
-  Vaikeparameetrite kasutamine võimaldab väljakutseid ka ilma argumentideta:
-
-  ```javascript
-  freeText()   // "välja müüdud"
-  price()      // 10
-  withVat()    // 0
-  seatLabel()  // "Rida 1-Nr 1"
-  ```
+Vaikelugud tähendab seda, et puuduv argument võtab automaatselt väärtuse, näiteks `free = 0`, `tier = "standard"`, `qty = 1`, `vatRate = 0.22`, `row = 1`, `nr = 1`, `separator = "-"`.
 
 ---
 
-### 2. `freeText` eristab nulli, positiivset arvu ja vigast sisendit
+### 2. `freeText` eristab kolme juhtu: 0, positiivne arv ja vigane sisend.
 
-* Enne väärtuse kasutamist kontrollitakse, kas tegemist on arvuga. Nulli kontrolliti rangelt tingimusega `free === 0`, positiivne arv kuvati vabade kohtade arvuna ning muu väärtus määrati vigaseks sisendiks.
+`freeText(0)` annab `"välja müüdud"`;  
+`freeText(5)` annab `"5 vaba"`;  
+`NaN`, `undefined`, `-1` ja stringid tuleb käsitleda vigasena. `price("vip")`  
+ja `price("child")` töötavad, aga tundmatud hinnaklassid ei tagasta `NaN`, vaid viskavad `RangeError`.  
 
-  ```javascript
-  freeText(0)      // "välja müüdud"
-  freeText(5)      // "5 vaba"
-  freeText(-1)     // "vigane sisend"
-  freeText("5")    // "vigane sisend"
-  freeText(NaN)    // "vigane sisend"
-  ```
-
-  Selline järjekord on vajalik, sest `0` on JavaScriptis falsy väärtus, kuid ülesandes tähistab arvuline null välja müüdud sündmust.
+`Object.hasOwn(priceTiers, tier)` on õige kontroll, sest `tier in priceTiers` vaatab ka prototüübi ja võib anda vale tulemuse. See on oluline, et `price("toString")` ei oleks `NaN` vaid tõene veaga.
 
 ---
 
-### 3. `price` viskab tundmatu hinnaklassi puhul `RangeError`-i
+### 3. `price` viskab tundmatu hinnaklassi peale `RangeError`-i, mitte ei anna `NaN`.
 
-* Kasutatud hinnaklassid on `standard`, `vip` ja `child`. Tundmatu klassi puhul ei tagastata `NaN`-i, vaid visatakse selge veaga `RangeError`. Funktsioonis kasutati vaikeparameetreid ja rest-parameetrit `...extras`.
+`prototypeChain()` tulemuse väljastas tabelina:
 
-  ```javascript
-  price()                 // 10
-  price("vip", 2)         // 50
-  price("vip", 2, 3, 4)   // 57
-  price("unknown")        // RangeError
-  ```
+| Vaade | Tulemus |
+| --- | --- |
+| `chain` | `true` |
+| `class_type` | `"function"` |
+| `this_with_object` | `"VIP"` |
+| `this_detached` | `TypeError` |
 
-  Rest-parameetri kaudu antud arvulised lisatasud liideti kogusummale.
-
----
-
-### 4. `createCart` tagastab sulundi peidetud sisemise massiiviga
-
-* `rows` loodi funktsiooni sees ning otsetagastust ei kasutata. Ostukorviga suhtlemine toimub ainult meetodite `add`, `getRows` ja `getCount` kaudu. `getRows` tagastab massiivi koopia, vältides sisemise oleku muutmist.
-
-  ```javascript
-  const cart = createCart();
-  cart.add({ name: "Pilet" });
-  cart.getCount(); // 1
-
-  const rows = cart.getRows();
-  rows.push({ name: "Kopeeritud pilet" });
-  cart.getCount(); // 1
-  ```
-
-  Sulundi sees olev `rows` jääb väljastpoolt varjatuks ja kaitstuks.
+See näitab, et `Child.prototype` pärineb `Base.prototype`-ist ja `this` sõltub sellest, kuidas meetod välja kutsutakse. Kui meetod eemaldada objektilt ja kutsuda ilma `this`-ta, tekib `TypeError`.
 
 ---
 
-### 5. Vihje: kontrolli `=== 0`, mitte lihtsalt `if (!free)`
+### 4. `createCart` tagastab objekti, mille sisemine massiiv jääb väjast nähtamatuks.
 
-* Tingimus `if (!free)` käsitleks nulliga samamoodi ka teisi falsy väärtusi, näiteks `""`, `false` ja `undefined`. Funktsioonis kasutati täpset kontrolli `free === 0`, sest ainult arvuline null tähistab ülesandes välja müüdud sündmust.
-
-  ```javascript
-  freeText(0)       // "välja müüdud"
-  freeText(false)   // "vigane sisend"
-  freeText("")      // "vigane sisend"
-  ```
-
-  Range comparison (`===`) ei teisenda väärtuste tüüpe automaatselt.
+`NaN` ei võrdu iseendaga. Seega tuleb kasutada `Number.isNaN(value)`, mitte `value === NaN`.  
+JavaScripti falsy väärtused on `false`, `0`, `-0`, `0n`, `""`, `null`, `undefined` ja `NaN`.  
+Just seda loogikat kasutati `freeText()` ja `price()` kontrollides.
 
 ---
 
-### 6. `scopeDemo(3)`: `var` ja `let` sulundis
+### 5. VIHJE: kontrolli `=== 0`, mitte `ifree` — null on väär ja haru läheb valeks.
 
-* `var` on funktsiooniulatusega. Kõik loodud funktsioonid loevad sama muutujat `i`, väärtuseks pärast tsüklit jääb `3`. `let` on plokiulatusega ning iga tsükli korduseks luuakse eraldi muutuja `j`.
-
-  ```javascript
-  scopeDemo(3);
-  // {
-  //   var_: [3, 3, 3],
-  //   let_: [0, 1, 2]
-  // }
-  ```
-
-  Tulemused näitavad `let` sobivust tsüklis loodud sulundite kasutamisel.
-
----
-
-### 7. `comparisons()` ja `prototypeChain()`: tulemused tabelina
-
-#### Võrdlusoperaatorid
-
-| Avaldis | Tulemus | Selgitus |
-| --- | --- | --- |
-| `0 == ""` | `true` | lõtv võrdlus teisendab tüüpe |
-| `0 === ""` | `false` | range võrdlus ei teisenda tüüpe |
-| `"6" == 6` | `true` | sõne teisendatakse arvuks |
-| `null == undefined` | `true` | erandlik lõdva võrdluse reegel |
-| `null === undefined` | `false` | väärtused ja tüübid on erinevad |
-| `NaN === NaN` | `false` | `NaN` ei võrdu iseendaga |
-
-JavaScripti kaheksa falsy väärtust on `false`, `0`, `-0`, `0n`, `""`, `null`, `undefined` ja `NaN`. `NaN` kontrollimiseks tuleb kasutada `Number.isNaN()` või `Number.isNaN(value)`, mitte võrdlust `value === NaN`.
-
-#### Prototüübiahel ja `this`
-
-`prototypeChain()` tagastab:
+Silumiseks oli kõige kasulikum tingimuslik breakpoint:
 
 ```javascript
-{
-  chain: true,
-  class_type: "function",
-  this_with_object: "VIP",
-  this_detached: "TypeError"
-}
+tier === "vip"
 ```
 
-Tulemused näitavad `Child.prototype` pärinemist `Base.prototype`-ist, klassi tüübiks JavaScriptis on `function` ning objekti kaudu tehtud meetodiväljakutses määratakse `this` väärtuseks objekt. Meetodi eraldamisel muutujasse ja väljakutsel ilma objektita puudub vajalik `this` ning tekib `TypeError`.
+Siis näeb brauser reaalset väärtust `qty`, `extras` ja `total` ilma iga kord uuesti sissekannetega peatamata.  
+See on oluline, sest leheküljel kontrollitakse just VIP-pileteid ja nende koguhinda.
 
 ---
 
-### 8. Tingimuslik katkestuspunkt piletiklassi kontrollimiseks
+### 6. Jooksuta `scopeDemo(3)` ja kirjuta mõlemad massiivid täpselt üles.
 
-* Funktsioonis `price` kontrollitakse, kas `tier` leidub hinnaklasside objektis. Silumisel saab kasutada tingimuslikku breakpoint'i tingimusega:
+`scopeDemo(3)` näitab selgelt, kuidas `var` ja `let` erinevalt töötavad. `var` on funktsiooni ulatuses, `let` aga ploki ulatuses. Tegelik tulemus on järgmine:
 
-  ```javascript
-  tier === "vip"
-  ```
+```text
+var_ = [3, 3, 3]
+let_ = [0, 1, 2]
+```
 
-  Katkestus toimub ainult VIP-pileti arvutamisel. Nii saab vaadata `qty`, `extras` ja `total` väärtusi ilma iga funktsioonikutse juures peatamata.
+See on oluline, sest ülesande eesmärk on kontrollida, milline muutuja ulatuslik käitumine on oodatud.
 
 ---
 
-### 9. `docs/debugging.md`: ulatus, võrdlemine, sulund ja prototüübiahel
+### 7. Jooksuta `comparison(s)` ja `prototypeChain()`; pane mõlemad tulemused tabelisse.
 
-* Failis dokumenteeriti kõik ülesandes nõutud teemad:
-
-  - `var` ja `let` erinevused sulundis;
-  - `var` hoisting ja `let`-i ajaline surnud tsoon;
-  - lõtv (`==`) ja range (`===`) võrdlus;
-  - falsy väärtused ja `NaN`;
-  - sulundiga peidetud ostukorvi olek;
-  - klasside prototüübiahel;
-  - `this` käitumine meetodi ühendatud ja eraldatud väljakutses.
+Võrdlemine ja prototüübi ahel on klassikalised JS-i vead. `NaN == NaN` annab `false` ja `prototypeChain()` näitab `Child -> Base -> Object` järjestust.  
+Tulemused tuleb tabelina välja näidata, mitte lihtsalt kirjeldada.
 
 ---
 
-## Oodatav tulemus ja kontrollnäited
+### 8. Pane tingimuslik katkestuspunkt, mis peatab ainult `tier === "vip"` korral.
 
-```javascript
-scopeDemo(3)
-// var_: [3, 3, 3]
-// let_: [0, 1, 2]
+See on konstruktiivne silumispunkt, kus näeb täpselt `qty`, `extras` ja `total` väärtusi.  
+Tulemuslikel testidel oli just VIP-juhtum kõige parem, sest seal on kogu arvutuse logika kokkuvõtlikult näha.
 
-hoisting()
-// var_before: "undefined"
-// var_after: 18
-// let_before: "ReferenceError"
-// let_after: 120
+---
+
+### 9. Kirjuta `docs/debugging.md`: ulatus, võrdlemine, sulund ja PROTOTÜÜBIAHEL.
+
+Dokumentatsioonis tuleb kokkuvõte, tabelid ja reaalne tulemus.  
+Teostus on `public/format.js` ja `debug.js`-sarnane väljastuspõhimõte, mitte teksti kloonimine koodist.
+
+---
+
+## Oodatav tulemus
+
+Faili `docs/debugging.md` kuju. Reaalsed tulemused on jooksutatud ja vastavad `public/format.js` funktsioonide käitumisele.
+
+```text
+# Ülesanne 1 — Keel, ulatus ja silumine
+## 1. Vaikelugud ja tulemused
+freeText(0) -> "välja müüdud"
+price("vip", 2, 3) -> 53
+withVat(100) -> 122
+createCart().getCount() -> 0
+seatLabel(2, 5, "/") -> "Rida 2/Nr 5"
+
+## 2. `RangeError` ja `Object.hasOwn`
+price("toString") -> RangeError
+
+## 3. Prototüübi ahel
+priceTiers on objekt, `Object.hasOwn` kontrollib ainult enda omadusi.
+
+## 4. Breakpoint
+`tier === "vip"` peaks peatumispunktis näitama `qty`, `extras` ja `total`.
 ```
 
-Hoisting'u oluline erinevus seisneb selles, et `var` on enne deklaratsioonirida olemas väärtusega `undefined`, kuid `let` asub enne deklaratsioonirida ajalises surnud tsoonis ja lugemine põhjustab `ReferenceError`-i.
-
-```javascript
-freeText(0)       // "välja müüdud"
-freeText(12)      // "12 vaba"
-freeText(NaN)     // "vigane sisend"
-price("wrong")    // RangeError
-```
+`NaN` ei võrdu iseendaga, seega tuleb kasutada `Number.isNaN(value)` ja `Object.hasOwn(...)` asemel `tier in ...` kontrolli.

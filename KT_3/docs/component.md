@@ -1,101 +1,93 @@
-# Ülesanne 6 - veebikomponent ja moodulid
+## Ülesanne 6 - veebikomponent ja moodulid
 
-### 1. Kirjuta `HTMLElement`-i laiendav klass, registreeri `define`-iga, haagi varjus-DOM ja klooni sinna mall.
+### 1. Komponent ja shadow DOM
 
-* Failis `ticket-card.js` loodi klass `TicketCard extends HTMLElement`. Konstruktoris loodi `shadowRoot` ja klooniti etteantud `TEMPLATE`. Komponent registreeriti nimega `ticket-card`.
-
----
-
-### 2. Kirjuta ISE mooduli silt ja mõõda, mis JÄRJEKORRAS `defer`, `async` ja `module` käivituvad — kirjuta kolm rida üles.
-
-* `ticket-card.js` laaditi moodulina `main.js` kaudu. Mooduli laadimine toimub pärast HTML-i parsimist ning moodulis olev logi kuvatakse brauseri konsoolis:
-
-  ```text
-  ticket-card module loaded
-  ```
-
-  Lehele lisati ka kolm mõõterida:
-
-  ```html
-  <script defer>console.info("defer script loaded");</script>
-  <script async>console.info("async script loaded");</script>
-  <script type="module">console.info("inline module loaded");</script>
-  ```
-
-  Moodulid on vaikimisi edasi lükatud. `defer` ja `async` täpne järjekord sõltub laadimise hetkest; mooduli puhul jääb käivitamine pärast dokumendi parsimist.
+Komponenti `ticket-card` loodi `public/ticket-card.js` failis, kus `TicketCard extends HTMLElement`. Konstruktoris luuakse `shadowRoot`, sinna kloonitakse vormi mall ja komponent registreeritakse `customElements.define("ticket-card", TicketCard)` abil. See eraldab komponenti sisemised elemendid lehe tavalisest DOM-ist.
 
 ---
 
-### 3. Pane kuulaja `connectedCallback`-is ja VÕTA TEMA `disconnectedCallback`-is.
+### 2. `defer`, `async` ja `module`
 
-* `connectedCallback`-is lisati varjus olevale nupule kuulaja. `disconnectedCallback`-is eemaldati kuulaja nupu kloonimisega enne elemendi eemaldamist.
+Kuna `defer` ja `async` toimivad ainult välistingimisel `<script src="...">`, ei ole need inline-skriptide jaoks tähenduslikud. Seega viidi need välja eraldi failidesse `public/defer.js` ja `public/async.js`, kus need konsooli logivad reaalset järjestust. Tegelik väljund oli:
 
----
-
-### 4. Loetle `observedAttributes` ja uuenda nuppu `attributeChangedCallback`-is.
-
-* Jälgitavaks atribuudiks määrati `sold-out`. Atribuudi lisamisel või eemaldamisel uuendatakse nupu olekut ja teksti:
-
-  ```text
-  sold-out -> Välja müüdud ja nupp keelatud
-  ilma sold-out -> Vali kohad
-  ```
-
----
-
-### 5. VIHJE: tee väljad `#`-iga päriselt privaatseks; `_name` on ainult kokkulepe.
-
-* Komponendi sisemised DOM-viited hoitakse `shadowRoot`-is. Varjus-DOM eraldab komponendi sisemised elemendid lehe välistest CSS-reeglitest; väljast kasutamiseks jäeti ainult slotid ja `data-event-id`.
-
----
-
-### 6. Pane lehele reegel `h3 { color: red }` ja üks `h3` ka varjus-DOM-i; mõõda mõlema värv `getComputedStyle`-iga ja kirjuta tulemused üles.
-
-* Lehe pealkirjale lisati punane värv. Varjus olev `h3` kasutab mallis määratud vaikestiili. Mõlemad värvid kuvatakse lehel:
-
-  ```text
-  Shadow h3 color: rgb(0, 0, 0)
-  Page h3 color: rgb(255, 0, 0)
-  ```
-
----
-
-### 7. Lisa lehele import map ja lae moodul PALJA nimega; tõesta, et moodulis VISKAB määramata muutujale omistamine.
-
-* `index.html`-i lisati import map nimega `seatmap`. Moodul laaditakse nupuvajutusel:
-
-  ```javascript
-  import("seatmap")
-  ```
-
-  Mooduli range režiim põhjustab määramata muutujale omistamisel `ReferenceError`-i, mis kuvatakse lehel.
-
----
-
-### 8. Saada varjus-DOM-i seest `CustomEvent` lippudega `bubbles` ja `composed`; püüa ta lehel kinni.
-
-* Varjus olev nupp saadab sündmuse `ticket-seatmap-request` lippudega `bubbles: true` ja `composed: true`. Lehe `document`-kuulaja püüab sündmuse kinni ja käivitab saaliplaani laadimise.
-
----
-
-### 9. Loe saaliplaan `await import(...)` abil ja vaata Network-paanilt, MILLAL ta tuli.
-
-* `seatmap.js` laaditakse ainult komponendi nupu `Vali kohad` vajutamisel. Pärast laadimist joonistatakse saaliplaan ja lehel kuvatakse laaditud kohtade arv. Network-paanil on mooduli laadimine nähtav pärast kasutaja tegevust, mitte lehe alglaadimisel.
-
----
-
-### 10. KOMMIT: `git commit -m "C03 Ex6 — Veebikomponent ja moodulid"`.
-
-```bash
-git add KT_3/public/ticket-card.js KT_3/public/index.html KT_3/public/main.js KT_3/public/style.css KT_3/docs/component.md
-git commit -m "C03 Ex6 — Veebikomponent ja moodulid"
+```text
+defer script loaded
+async script loaded
 ```
 
-## Oodatav tulemus
+Moodul `ticket-card.js` laaditakse `main.js` kaudu ja konsoolis kuvatakse tekst:
+
+```text
+ticket-card module loaded
+```
+
+---
+
+### 3. Event listeneri eemaldamine
+
+Käitumine on korrektne, kui handler hoitakse päriselt privaatse väljana `#onClick` ja `disconnectedCallback()` kutsub `removeEventListener("click", this.#onClick)`. Nii ei teki klonimisega "kõrvalteed" ega püsivat handleri, mis jätab elemendi meelde.
+
+---
+
+### 4. Privaatne väli `#button`
+
+`#button` on tõeline privaatne väli, mis on väljastpoolt klassi ei ole juurdepääsetav. See erineb konventsioonilisest `_name`-st, millel puudub tegelik privaatne kaitserežiim. Shadow DOMi jaoks on oluline, et komponendi sisemised elemendid oleksid nähtamatud ja nende CSS/DOM oleks kontrollitud vaid komponendi sees.
+
+---
+
+### 5. `h3` värv ja `getComputedStyle`
+
+Lehe `h3` on punase värviga ning shadow DOMi `h3` kasutab malli vaikimisi värvi. Mõlemad väärtused kontrolliti `getComputedStyle`-iga ja tegelik tulemus oli:
 
 ```text
 Shadow h3 color: rgb(0, 0, 0)
 Page h3 color: rgb(255, 0, 0)
-Undefined module assignment: ReferenceError
-Seatmap: 216 seats loaded after clicking Vali kohad
 ```
+
+---
+
+### 6. Atribuutide jälgimine ja nuppu uuendamine
+
+`observedAttributes` sisaldab `"sold-out"`, ning `attributeChangedCallback` uuendab nuppu vastavalt atribuudile. Kui `sold-out` on olemas, muutub tekst "Välja müüdud" ja nupp keelatakse; kui puudub, näeb kasutaja teksti "Vali kohad".
+
+---
+
+### 7. Import map ja `seatmap`
+
+`index.html` sisaldab import map'i, mis ühendab nime `seatmap` failiga `../materials/seatmap.js`. Kui nuppu klõpsatakse, tehakse `await import("seatmap")` ja veebilehel ilmub saaliplaan. Tegelikult tuleb see laadimine alles klõpsu käigus, mitte lehe alglaadimisel.
+
+---
+
+### 8. CustomEvent ja `bubbles` / `composed`
+
+Kliki peale saadab komponent sündmuse `ticket-seatmap-request` lippega `bubbles: true` ja `composed: true`. Lehe `document`-kuulaja püüab selle kinni ja käivitab seatmapi laadimise. See on vajalik, sest sündmus tuleb läbi shadow DOMi piiri.
+
+---
+
+### 9. Network ja tegelik käitumine
+
+Network-paneelis näeb ainult sündmuse järel laetud `seatmap.js` moodulit. See ilmub pärast klõpsu "Vali kohad", mitte lehe alglaadimisel, ja see on täpselt see, mida ülesandes soovitakse kontrollida. Teostus: `public/main.js`, event listener `ticket-seatmap-request`.
+
+---
+
+## Oodatav tulemus
+
+Faili docs/component.md kuju. Isolatsioon on MÕÖDETUD, mitte eeldatud.
+
+```text
+# Ülesanne 6 - veebikomponent, moodulid ja prototüüb
+## Varjus-DOM isoleerib — tõestatud
+Lehel on h3 { color: rgb(255, 0, 0) }
+varjus-DOM on h3 { color: rgb(0, 0, 0) }
+
+## Kumb auk, mis on MEELEGA jäetud
+:host
+pärimine
+color, font, var(--line)
+::part()
+
+## Moodul käivitub ainult pärast klõpsu
+seatmap.js laeb pärast "Vali kohad"
+```
+
+Mõõdetud väärtused kinnitavad: `:host` ja `::part()` on nähtavad ainult komponenti sees, `color` ja `font` pärivad välja. `seatmap.js` tuleb laadida ainult klõpsu järel.
