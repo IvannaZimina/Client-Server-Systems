@@ -1,8 +1,6 @@
 // public/view.js
 
-/**
- * Task 3.1: Single state object containing events, sort field, direction, search query, and loading status.
- */
+// 3.1.
 let state = {
     events: [],
     sort: "name",
@@ -11,27 +9,18 @@ let state = {
     loading: false,
 };
 
-/**
- * Updates the state with partial changes and returns the read state copy.
- */
+// 3.1.
 export function setState(changes) {
     state = { ...state, ...changes };
     return readState();
 }
 
-/**
- * Task 3.2: Returns a deep copy of the current state, preventing direct reference mutation.
- */
+// 3.1.
 export function readState() {
     return JSON.parse(JSON.stringify(state));
 }
 
-/**
- * Task 3.2 & 3.3: forView(state)
- * Derives presentation data: filters events by search query (name/venue) and sorts them.
- * Returns TWO things: { rows, state }.
- * Note: The view drawer never looks back into the state directly (unidirectional flow).
- */
+// 3.2.
 export function forView(currentState) {
     let rows = [...currentState.events];
 

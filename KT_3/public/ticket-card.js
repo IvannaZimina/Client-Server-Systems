@@ -1,41 +1,46 @@
 import { TEMPLATE } from "../materials/card-template.js";
 
+// 6.1.
 class TicketCard extends HTMLElement {
     static observedAttributes = ["sold-out"];
     #button;
+    #onClick;
 
     constructor() {
         super();
-        // Task 6.1: create a shadow root and clone the provided template.
         this.attachShadow({ mode: "open" }).append(TEMPLATE.content.cloneNode(true));
     }
 
+    // 6.3.
     connectedCallback() {
-        // Task 6.3: run setup when the element is added to the DOM.
-        this.updateButton();
         this.#button = this.shadowRoot.querySelector("button");
-        this.#button.addEventListener("click", () => {
-                this.dispatchEvent(
-                    new CustomEvent("ticket-seatmap-request", {
-                        bubbles: true,
-                        composed: true,
-                        detail: { eventId: this.dataset.eventId },
-                    }),
-                );
-            });
+        this.#onClick = () => {
+            this.dispatchEvent(
+                new CustomEvent("ticket-seatmap-request", {
+                    bubbles: true,
+                    composed: true,
+                    detail: { eventId: this.dataset.eventId },
+                }),
+            );
+        };
+        this.#button?.addEventListener("click", this.#onClick);
+        this.updateButton();
     }
 
+    // 6.3.
     disconnectedCallback() {
-        // Task 6.3: clean up when the element is removed from the DOM.
-        this.#button?.replaceWith(this.#button.cloneNode(true));
+        if (this.#button && this.#onClick) {
+            this.#button.removeEventListener("click", this.#onClick);
+        }
         this.#button = null;
+        this.#onClick = null;
     }
 
     attributeChangedCallback() {
-        // Task 6.4: update the component when an observed attribute changes.
         this.updateButton();
     }
 
+    // 6.6.
     updateButton() {
         const button = this.#button ?? this.shadowRoot?.querySelector("button");
         if (!button) return;
@@ -45,7 +50,6 @@ class TicketCard extends HTMLElement {
     }
 }
 
+// 6.2.
 customElements.define("ticket-card", TicketCard);
-
-// Task 6.2: this file is an ES module and is loaded after defer/async examples.
 console.info("ticket-card module loaded");

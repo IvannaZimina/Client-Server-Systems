@@ -1,26 +1,26 @@
 const KEY = "piletikassa:draft";
 const VERSION = 1;
 
-// Task 5.1: use one versioned localStorage key.
+// 5.1.
 export function read() {
     try {
         const raw = localStorage.getItem(KEY);
         if (raw === null) return null;
 
         const record = JSON.parse(raw);
-        // Task 5.5: reject and remove data without the expected version.
+        // 5.5.
         if (record?.version !== VERSION) {
             localStorage.removeItem(KEY);
             return null;
         }
         return record.data ?? null;
     } catch {
-        // Task 5.2, 5.4, 5.7 and 5.8: invalid or unavailable storage returns null.
+        // 5.2.
         return null;
     }
 }
 
-// Task 5.3, 5.4 and 5.6: save JSON data and handle storage errors safely.
+// 5.3.
 export function save(data) {
     try {
         localStorage.setItem(
@@ -33,7 +33,7 @@ export function save(data) {
     }
 }
 
-// Task 5.3 and 5.4: remove the stored draft safely.
+// 5.4.
 export function remove() {
     try {
         localStorage.removeItem(KEY);

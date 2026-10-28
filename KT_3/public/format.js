@@ -1,9 +1,6 @@
 // public/format.js
 
-/**
- * freeText distinguishes three cases: 0, positive number, and invalid input.
- * Uses strict check === 0 as required to prevent falsy branch errors.
- */
+// 1.2.
 export function freeText(free = 0) {
     if (typeof free !== "number" || Number.isNaN(free)) {
         return "vigane sisend";
@@ -17,26 +14,20 @@ export function freeText(free = 0) {
     return "vigane sisend";
 }
 
-/**
- * price calculates the total price and throws a RangeError for unknown price tiers
- * instead of returning NaN. Uses default parameters and rest parameters for extras.
- */
+// 1.3.
 export function price(tier = "standard", qty = 1, ...extras) {
-    // Available price tiers aligned with project requirements
     const priceTiers = {
         standard: 10,
         vip: 25,
         child: 5,
     };
 
-    // Check if the tier exists; if not, throw RangeError (Item 3 requirement)
-    if (!(tier in priceTiers)) {
+    if (!Object.hasOwn(priceTiers, tier)) {
         throw new RangeError(`Unknown price tier: ${tier}`);
     }
 
     let total = priceTiers[tier] * qty;
 
-    // Sum up any additional extra costs using rest parameters
     for (const extra of extras) {
         if (typeof extra === "number") {
             total += extra;
@@ -45,18 +36,12 @@ export function price(tier = "standard", qty = 1, ...extras) {
     return total;
 }
 
-/**
- * Calculates total sum including VAT with a default rate of 22%.
- */
 export function withVat(sum = 0, vatRate = 0.22) {
     return sum * (1 + vatRate);
 }
 
-/**
- * createCart returns an object where the internal rows array remains completely hidden (closure).
- */
+// 1.4.
 export function createCart() {
-    // Closure: rows array is NOT visible from the outside
     const rows = [];
 
     return {
@@ -64,7 +49,7 @@ export function createCart() {
             rows.push(item);
         },
         getRows() {
-            return [...rows]; // Return a shallow copy to protect internal state
+            return [...rows];
         },
         getCount() {
             return rows.length;
@@ -72,9 +57,7 @@ export function createCart() {
     };
 }
 
-/**
- * Formats a seat label using default parameters and a custom separator.
- */
+// 1.
 export function seatLabel(row = 1, nr = 1, separator = "-") {
     return `Rida ${row}${separator}Nr ${nr}`;
 }

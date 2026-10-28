@@ -1,11 +1,23 @@
-// public/main.js
 import { setState, readState, forView } from "./view.js";
 import { runPerformanceBenchmarks, runCollectionTests } from "./perf.js";
 import { initEvents } from "./events.js";
 import { KEY, VERSION, read, remove, save } from "./draft.js";
+import { freeText, price, withVat } from "./format.js";
+import { allSoldOut, organizerName, seatsText } from "./stats.js";
 import "./ticket-card.js";
 
-// 1. Initial state setup
+function showTaskOneResults() {
+    document.getElementById("res-freetext").textContent = freeText(0);
+    document.getElementById("res-price").textContent = String(price("vip"));
+    document.getElementById("res-vat").textContent = String(withVat(100));
+}
+
+function showTaskTwoResults() {
+    document.getElementById("res-soldout").textContent = String(allSoldOut([]));
+    document.getElementById("res-seatstext").textContent = seatsText({ seats: 0 });
+    document.getElementById("res-org").textContent = organizerName({});
+}
+
 setState({
     events: [
         { id: 1, name: "Jazz Night", venue: "Salme", start: "2026-11-06", free: 18 },
@@ -15,36 +27,47 @@ setState({
     search: "",
 });
 
-// 2. Render function (State -> View)
 function render() {
-    const { rows } = forView(readState());
+    const { rows, state: currentState } = forView(readState());
     const list = document.getElementById("event-list");
 
     if (!list) return;
     list.innerHTML = "";
 
+    if (currentState.loading) {
+        const li = document.createElement("li");
+        li.textContent = "Laen…";
+        list.appendChild(li);
+        return;
+    }
+
+    if (rows.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "Ühtegi sündmust ei leitud";
+        list.appendChild(li);
+        return;
+    }
+
     for (const event of rows) {
         const li = document.createElement("li");
-        li.className = "list-group-item";
+        li.className = "event-item";
         li.textContent = `${event.name} (${event.venue})`;
         list.appendChild(li);
     }
 }
 
-// 3. Search input listener (setState -> render)
 const searchInput = document.getElementById("search-input");
 if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-        setState({ search: e.target.value });
+    searchInput.addEventListener("input", (event) => {
+        setState({ search: event.target.value });
         render();
     });
 }
 
-// Run performance benchmarks and collection tests
 runPerformanceBenchmarks();
 runCollectionTests();
-
-// Initial render
+showTaskOneResults();
+showTaskTwoResults();
 render();
 initEvents();
 
@@ -107,7 +130,6 @@ function showStorageResults() {
 showStorageResults();
 
 function showComponentResults() {
-    // Task 6.5 and 6.6: compare page CSS with Shadow DOM CSS.
     const card = document.querySelector("ticket-card");
     const shadowHeading = card?.shadowRoot?.querySelector("h3");
     const pageHeading = document.querySelector(".component-demo > h3");
@@ -118,7 +140,6 @@ function showComponentResults() {
 
     let moduleTest = "no error";
     try {
-        // Task 6.7: ES modules run in strict mode.
         undeclaredModuleValue = 1;
     } catch (error) {
         moduleTest = error.constructor.name;
@@ -127,7 +148,6 @@ function showComponentResults() {
 }
 
 document.addEventListener("ticket-seatmap-request", async (event) => {
-    // Task 6.8 and 6.9: catch the composed event and load the seatmap lazily.
     const host = document.getElementById("seatmap-host");
     const result = document.getElementById("component-seatmap-result");
     const { drawSeatmap } = await import("seatmap");

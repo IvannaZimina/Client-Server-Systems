@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>C03 Test - Tasks 1, 2, 3, 4, 5 & 6</title>
-    <!-- Подключаем отдельный файл стилей -->
     <link rel="stylesheet" href="./style.css">
     <script type="importmap">
         {
@@ -13,9 +12,8 @@
             }
         }
     </script>
-    <script defer>console.info("defer script loaded");</script>
-    <script async>console.info("async script loaded");</script>
-    <script type="module">console.info("inline module loaded");</script>
+    <script defer src="./defer.js"></script>
+    <script async src="./async.js"></script>
 </head>
 
 <body>
@@ -53,7 +51,7 @@
         <h2>Ülesanne 4 — Sündmused ja delegeerimine</h2>
         <form id="search" class="event-search">
             <label for="search-text">Otsi nime või toimumiskoha järgi
-                <input type="search" id="search-text" name="search" placeholder="nt jazz">
+                <input type="search" id="search-text" name="search" placeholder="nt jazz" minlength="2" maxlength="80">
             </label>
             <label for="sort">Järjesta
                 <select id="sort" name="sort">
