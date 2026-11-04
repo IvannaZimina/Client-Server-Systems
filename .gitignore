@@ -32,6 +32,3 @@
 Thumbs.db
 Desktop.ini
 .DS_Store
-
-# Course-specific local materials: KT_3 keeps its materials outside Git.
-/KT_3/materials/
