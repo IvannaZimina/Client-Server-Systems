@@ -1,20 +1,23 @@
 // public/format.js
 
-// 1.2.
+// Ülesanne 1 — freeText()
 export function freeText(free = 0) {
-    if (typeof free !== "number" || Number.isNaN(free)) {
+    if (typeof free !== "number" || !Number.isFinite(free)) {
         return "vigane sisend";
     }
+
     if (free === 0) {
         return "välja müüdud";
     }
+
     if (free > 0) {
         return `${free} vaba`;
     }
+
     return "vigane sisend";
 }
 
-// 1.3.
+// Ülesanne 1 — price()
 export function price(tier = "standard", qty = 1, ...extras) {
     const priceTiers = {
         standard: 10,
@@ -33,14 +36,16 @@ export function price(tier = "standard", qty = 1, ...extras) {
             total += extra;
         }
     }
+
     return total;
 }
 
+// Ülesanne 1 — withVat()
 export function withVat(sum = 0, vatRate = 0.22) {
     return sum * (1 + vatRate);
 }
 
-// 1.4.
+// Ülesanne 1 — createCart()
 export function createCart() {
     const rows = [];
 
@@ -48,16 +53,18 @@ export function createCart() {
         add(item) {
             rows.push(item);
         },
+
         getRows() {
             return [...rows];
         },
+
         getCount() {
             return rows.length;
         },
     };
 }
 
-// 1.
+// Ülesanne 1 — seatLabel() (ette antud funktsioon)
 export function seatLabel(row = 1, nr = 1, separator = "-") {
     return `Rida ${row}${separator}Nr ${nr}`;
 }
