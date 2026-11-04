@@ -1,44 +1,111 @@
 # C03 — Client-Server Systems: Control Work 3
 
-This repository contains the implementation for Control Work 3 (C03), focusing on JavaScript fundamentals, declarative array methods, object manipulation, closures, debugging techniques, and DOM state management within a ticket sales application domain (*Piletikassa*)[cite: 2, 3, 6, 7].
+This repository contains the implementation of Control Work 3 (C03) for the Client-Server Systems course.
+
+The project uses a ticket sales application (*Piletikassa*) domain to demonstrate JavaScript fundamentals, array and object manipulation, closures, debugging, DOM state management, performance testing, Web Components, Shadow DOM, and JavaScript modules.
 
 ## Project Structure
 
-- **`public/`**
-  * `format.js` — JavaScript fundamentals (default parameters, error handling, closures, strict comparisons)[cite: 2, 3].
-  * `stats.js` — Declarative array methods (`map`, `filter`, `find`, `reduce`, `some`, `every`, `sort`), object destructuring, optional chaining (`?.`), nullish coalescing (`??`), and safe JSON handling[cite: 6, 7].
-  * `view.js` — State management (`setState`, `readState`) and unidirectional view derivation (`forView`)[cite: 14].
-  * `perf.js` — DOM performance benchmarks and collection behavior tests.
-  * `index.html` — Interactive client-side test bench and UI for all tasks[cite: 9, 14].
-  * `main.js` — Application logic linking modules, state, and presentation[cite: 9].
-  * `style.css` — Custom clean styles for the test bench UI.
-- **`docs/`**
-  * `debugging.md` — Analysis of scope (`var` vs `let`), hoisting, comparisons, closures, and the prototype chain[cite: 5].
-  * `arrays.md` — Insights into declarative array processing, sort stability, and edge cases (e.g., empty selections in `allSoldOut`)[cite: 9].
-  * `view.md` — Performance benchmarks for 2000 rows and live vs static DOM collections.
+```text
+KT_3/
+├── public/
+│   ├── index.html
+│   ├── main.js
+│   ├── style.css
+│   ├── format.js
+│   ├── stats.js
+│   ├── view.js
+│   ├── perf.js
+│   ├── defer.js
+│   ├── async.js
+│   └── ticket-card.js
+├── docs/
+│   ├── debugging.md
+│   ├── arrays.md
+│   ├── view.md
+│   └── component.md
+└── materials/
+    └── public/
+        ├── card-template.js
+        └── seatmap.js
+```
+
+### Main Files
+
+- `index.html` — Interactive test bench and user interface for the assignments.
+- `main.js` — Main application logic connecting modules, state, event handling, and presentation.
+- `style.css` — Styles for the application interface.
+- `format.js` — JavaScript fundamentals, including default parameters, error handling, closures, and strict comparisons.
+- `stats.js` — Declarative array methods, object manipulation, and safe JSON handling.
+- `view.js` — Application state management and view derivation.
+- `perf.js` — DOM performance benchmarks and live versus static collection tests.
+- `defer.js` and `async.js` — Scripts used to compare script loading and execution order.
+- `ticket-card.js` — Custom Web Component implementation using Shadow DOM.
+
+### Documentation
+
+- `debugging.md` — Scope (`var` vs `let`), hoisting, comparisons, closures, and the prototype chain.
+- `arrays.md` — Declarative array processing, sorting behavior, and edge cases.
+- `view.md` — DOM performance measurements and collection behavior.
+- `component.md` — Web Components, Shadow DOM, script loading, JavaScript modules, and dynamic imports.
 
 ## Tasks Overview
 
-### Task 1: Language, Scope, and Debugging (`format.js` & `debugging.md`)
-- Implemented modular functions with default parameters (`freeText`, `price`, `withVat`, `createCart`, `seatLabel`)[cite: 2, 3].
-- Ensured strict type checking and proper error handling (`RangeError` thrown for unknown price tiers instead of returning `NaN`)[cite: 3].
-- Implemented data privacy using closures (`createCart` keeps internal rows hidden)[cite: 3].
-- Documented scope behavior (`var` vs `let`), hoisting, and prototype chains in `docs/debugging.md`[cite: 5].
+### Task 1: JavaScript Fundamentals, Scope, and Debugging
 
-### Task 2: Arrays and Objects (`stats.js` & `arrays.md`)
-- Built declarative data processing pipelines for event statistics (`available`, `list`, `findById`, `revenue`, `anyFree`, `allSoldOut`)[cite: 6, 7].
-- Implemented safe array sorting (`sortBy`) using data copying (`[...rows]`) to prevent mutation, alongside stable sorting by `id`[cite: 7].
-- Leveraged advanced object features: destructuring with renaming/defaults (`summary`), optional chaining (`organizerName`), and nullish coalescing (`seatsText`)[cite: 7, 8].
-- Handled robust JSON serialization and parsing (`pack`, `unpack`) wrapped in `try...catch` blocks[cite: 8].
-- Documented counter-intuitive findings (e.g., `every([])` behavior and nullish coalescing specifics) in `docs/arrays.md`[cite: 9].
+Files: `format.js`, `debugging.md`
 
-### Task 3: DOM, State, and View (`view.js`, `perf.js` & `view.md`)
-- Implemented unidirectional data flow architecture: single state object, `setState`, `readState` (returning deep copies), and pure `forView(state)` derivation[cite: 14].
-- Built dynamic event filtering and sorting connected to reactive UI inputs[cite: 14].
-- Conducted DOM performance benchmarks comparing `appendChild`, `replaceChildren`, and `DocumentFragment` for 2000 elements.
-- Analyzed and documented the behavior of live (`getElementsByClassName`) versus static (`querySelectorAll`) collections during element removal.
-- Compiled performance metrics and insights into `docs/view.md`.
+- Implemented modular functions with default parameters (`freeText`, `price`, `withVat`, `createCart`, `seatLabel`).
+- Added strict type checking and error handling, including `RangeError` for unknown price tiers.
+- Used closures to keep internal cart data private.
+- Documented scope behavior, hoisting, and the prototype chain.
+
+### Task 2: Arrays and Objects
+
+Files: `stats.js`, `arrays.md`
+
+- Implemented declarative data processing using `map`, `filter`, `find`, `reduce`, `some`, `every`, and `sort`.
+- Created event statistics functions (`available`, `list`, `findById`, `revenue`, `anyFree`, `allSoldOut`).
+- Implemented non-mutating sorting with array copying and stable sorting by ID.
+- Used object destructuring, optional chaining (`?.`), and nullish coalescing (`??`).
+- Added safe JSON serialization and parsing with error handling.
+- Documented array method behavior and edge cases.
+
+### Task 3: DOM, State, and View
+
+Files: `view.js`, `perf.js`, `view.md`
+
+- Implemented unidirectional data flow with a single state object.
+- Added `setState` and `readState`, with `readState` returning a deep copy.
+- Implemented `forView(state)` to derive the displayed data from the application state.
+- Connected event filtering and sorting to the user interface.
+- Compared DOM insertion methods (`appendChild`, `replaceChildren`, and `DocumentFragment`) using 2,000 elements.
+- Compared live collections (`getElementsByClassName`) with static collections (`querySelectorAll`).
+- Documented the measurements and observations.
+
+### Task 6: Web Components and JavaScript Modules
+
+Files: `ticket-card.js`, `main.js`, `index.html`, `defer.js`, `async.js`, `style.css`, `component.md`
+
+- Created a custom `TicketCard` element extending `HTMLElement`.
+- Implemented Shadow DOM and cloned the provided component template.
+- Added event listeners in `connectedCallback` and removed them in `disconnectedCallback`.
+- Used private class fields (`#button`, `#onClick`).
+- Implemented attribute observation with `observedAttributes` and `attributeChangedCallback`.
+- Tested CSS isolation between the page and Shadow DOM using `getComputedStyle`.
+- Compared `defer`, `async`, and module script execution order.
+- Added an import map and loaded a module using a bare module name.
+- Tested strict mode behavior in ES modules.
+- Dispatched a custom event from Shadow DOM using `bubbles` and `composed`.
+- Loaded the seat map dynamically with `await import()` after a button click.
+- Checked the module loading time in the browser Network panel.
 
 ## Running the Project
-1. Open the project folder in VS Code.
-2. Run `public/index.html` using a live server (or open it directly in a browser) to view the interactive test bench results and event filter UI across all tasks[cite: 9, 14].
+
+1. Open the repository folder in Visual Studio Code.
+2. Start a local development server, for example using the Live Server extension.
+3. Open `public/index.html` through the local server in a browser.
+4. Use the interactive test bench to run the examples and inspect the results.
+5. Open the browser Developer Tools to check console messages, errors, and Network requests.
+
+A local development server is required for reliable ES module and import map loading.
