@@ -1,6 +1,6 @@
 // public/view.js
 
-// 3.1.
+// Ülesanne 3.1. Olek ühe objektina
 let state = {
     events: [],
     sort: "name",
@@ -9,44 +9,52 @@ let state = {
     loading: false,
 };
 
-// 3.1.
+// Ülesanne 3.1. setState()
 export function setState(changes) {
     state = { ...state, ...changes };
     return readState();
 }
 
-// 3.1.
+// Ülesanne 3.1. readState() — tagastab koopia
 export function readState() {
-    return JSON.parse(JSON.stringify(state));
+    return structuredClone(state);
 }
 
-// 3.2.
+// Ülesanded 3.2. ja 3.3. forView()
 export function forView(currentState) {
     let rows = [...currentState.events];
 
-    // Filter by search query if present
-    if (currentState.search && currentState.search.trim() !== "") {
-        const query = currentState.search.toLowerCase();
-        rows = rows.filter(
-            (event) =>
-                (event.name && event.name.toLowerCase().includes(query)) ||
-                (event.venue && event.venue.toLowerCase().includes(query)),
-        );
+    // Otsing nime ja koha järgi
+    const query = currentState.search.trim().toLowerCase();
+
+    if (query !== "") {
+        rows = rows.filter((event) => {
+            const name = event.name?.toLowerCase() ?? "";
+            const venue = event.venue?.toLowerCase() ?? "";
+
+            return name.includes(query) || venue.includes(query);
+        });
     }
 
-    // Sort rows based on sort field and direction
+    // Sorteerimine välja ja suuna järgi
     rows.sort((a, b) => {
-        let valA = a[currentState.sort];
-        let valB = b[currentState.sort];
+        const valA = a[currentState.sort];
+        const valB = b[currentState.sort];
 
         if (typeof valA === "string" && typeof valB === "string") {
-            const comp = valA.localeCompare(valB);
-            return currentState.dir === "asc" ? comp : -comp;
-        } else {
-            if (valA < valB) return currentState.dir === "asc" ? -1 : 1;
-            if (valA > valB) return currentState.dir === "asc" ? 1 : -1;
-            return 0;
+            const comparison = valA.localeCompare(valB);
+            return currentState.dir === "asc" ? comparison : -comparison;
         }
+
+        if (valA < valB) {
+            return currentState.dir === "asc" ? -1 : 1;
+        }
+
+        if (valA > valB) {
+            return currentState.dir === "asc" ? 1 : -1;
+        }
+
+        return 0;
     });
 
     return {
