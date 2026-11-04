@@ -1,26 +1,29 @@
 import { TEMPLATE } from "../materials/card-template.js";
 
-// 6.1.
+// Ülesanne 6.1. Veebikomponendi klass
 class TicketCard extends HTMLElement {
-    // 6.4. Observed attributes
+    // Ülesanne 6.4. Jälgitavad atribuudid
     static observedAttributes = ["sold-out"];
-    // 6.5.
+
+    // Ülesanne 6.5. Päriselt privaatsed väljad
     #button;
     #onClick;
 
+    // Ülesanne 6.1. Shadow DOM-i loomine ja malli kloonimine
     constructor() {
         super();
-        // 6.1.
+
         this.attachShadow({ mode: "open" }).append(
             TEMPLATE.content.cloneNode(true),
         );
     }
 
-    // 6.3.
+    // Ülesanne 6.3. Kuulaja lisamine elemendi ühendamisel DOM-iga
     connectedCallback() {
         this.#button = this.shadowRoot.querySelector("button");
+
         this.#onClick = () => {
-            // 6.8.
+            // Ülesanne 6.8. Kohandatud sündmuse saatmine Shadow DOM-ist välja
             this.#button.dispatchEvent(
                 new CustomEvent("ticket-seatmap-request", {
                     bubbles: true,
@@ -29,36 +32,41 @@ class TicketCard extends HTMLElement {
                 }),
             );
         };
+
         this.#button?.addEventListener("click", this.#onClick);
         this.updateButton();
     }
 
-    // 6.3.
+    // Ülesanne 6.3. Kuulaja eemaldamine elemendi eemaldamisel DOM-ist
     disconnectedCallback() {
         if (this.#button && this.#onClick) {
             this.#button.removeEventListener("click", this.#onClick);
         }
+
         this.#button = null;
         this.#onClick = null;
     }
 
-    // 6.4.
+    // Ülesanne 6.4. Nupu uuendamine atribuudi muutumisel
     attributeChangedCallback() {
         this.updateButton();
     }
 
-    // 6.4.
+    // Ülesanne 6.4. Nupu oleku ja teksti uuendamine
     updateButton() {
         const button = this.#button ?? this.shadowRoot?.querySelector("button");
+
         if (!button) return;
+
         const soldOut = this.hasAttribute("sold-out");
+
         button.disabled = soldOut;
         button.textContent = soldOut ? "Välja müüdud" : "Vali kohad";
     }
 }
 
-// 6.1.
+// Ülesanne 6.1. Kohandatud elemendi registreerimine
 customElements.define("ticket-card", TicketCard);
 
-// 6.2.
+// Ülesanne 6.2. Mooduli käivitumise kontrollimine
 console.info("ticket-card module loaded");

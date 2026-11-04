@@ -166,7 +166,8 @@ function showStorageResults() {
 // Ülesanne 6 — Veebikomponent ja moodulid
 function showComponentResults() {
     const card = document.querySelector("ticket-card");
-    const shadowHeading = card.shadowRoot.querySelector("h3");
+    const shadowRoot = card.shadowRoot;
+    const shadowHeading = shadowRoot.querySelector("h3");
     const pageHeading = document.querySelector(".component-demo > h3");
 
     document.getElementById("component-shadow-color").textContent =
@@ -175,6 +176,7 @@ function showComponentResults() {
     document.getElementById("component-page-color").textContent =
         getComputedStyle(pageHeading).color;
 
+    // Ülesanne 6.7 — Mooduli range režiim
     let moduleTest = "no error";
 
     try {
@@ -184,16 +186,51 @@ function showComponentResults() {
     }
 
     document.getElementById("component-module-test").textContent = moduleTest;
+
+    // Ülesanne 6.8 — composed: false kontroll
+    let shadowReceived = false;
+    let pageReceived = false;
+
+    const button = shadowRoot.querySelector("button");
+
+    const shadowListener = () => {
+        shadowReceived = true;
+    };
+
+    const pageListener = () => {
+        pageReceived = true;
+    };
+
+    shadowRoot.addEventListener("shadow-test", shadowListener);
+    document.addEventListener("shadow-test", pageListener);
+
+    button.dispatchEvent(
+        new CustomEvent("shadow-test", {
+            bubbles: true,
+            composed: false,
+        }),
+    );
+
+    shadowRoot.removeEventListener("shadow-test", shadowListener);
+    document.removeEventListener("shadow-test", pageListener);
+
+    document.getElementById("component-event-test").textContent =
+        `Shadow DOM: ${shadowReceived}; Page: ${pageReceived}`;
 }
 
-// Seatmap laadimine
+// Ülesanne 6.9 — Dünaamiline mooduli laadimine
 document.addEventListener("ticket-seatmap-request", async (event) => {
     const host = document.getElementById("seatmap-host");
     const result = document.getElementById("component-seatmap-result");
-    const { drawSeatmap } = await import("seatmap");
-    const info = drawSeatmap(host, event.detail.eventId);
 
-    result.textContent = `${info.seats} seats loaded for event ${info.eventId}`;
+    try {
+        const { drawSeatmap } = await import("seatmap");
+        const info = drawSeatmap(host, event.detail.eventId);
+
+        result.textContent = `${info.seats} seats loaded for event ${info.eventId}`;
+    } catch (error) {
+        console.error("Dynamic import failed:", error);
+    }
 });
 
 // Ülesannete käivitamine

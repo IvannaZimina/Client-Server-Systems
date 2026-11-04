@@ -110,7 +110,8 @@ h2 {
     white-space: pre-wrap;
 }
 
-.component-demo > h3 {
+/* Ülesanne 6.6. Shadow DOM-i stiiliisolatsiooni kontroll */
+h3 {
     color: red;
 }
 
