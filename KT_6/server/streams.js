@@ -3,7 +3,7 @@
 import fs from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { createInterface } from 'node:readline';
-import { Transform } from 'node:stream';
+import { Transform, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { once } from 'node:events';
 
@@ -76,20 +76,25 @@ export function csvToRows() {
 
 // 6. Faili kokkuvõtte arvutamine CSV voo põhjal.
 export async function summary(file) {
-  const rows = createReadStream(file).pipe(csvToRows());
-
   let count = 0;
   let tickets = 0;
 
-  for await (const row of rows) {
-    count += 1;
-    tickets += Number(row[2]);
-  }
+  const collectRows = new Writable({
+    objectMode: true,
+    write(row, encoding, callback) {
+      count += 1;
+      tickets += Number(row[2]);
+      callback();
+    }
+  });
 
-  return {
-    rows: count,
-    tickets
-  };
+  await pipeline(
+    createReadStream(file),
+    csvToRows(),
+    collectRows
+  );
+
+  return { rows: count, tickets };
 }
 
 // 8. Faili saatmine vastusevoona.
