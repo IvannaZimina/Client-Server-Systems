@@ -4,19 +4,18 @@ import { errorToState as errorText } from '../materials/error-text.js';
 
 // 3.1.
 export async function readResponse(response) {
-  if (!response.ok) {
-    // 3.3.
-    const body = await response.json().catch(() => ({}));
-    const error = new Error(body.err ?? `HTTP ${response.status}`);
-    error.kind = response.status >= 500 || response.status === 429 ? 'server' : 'client';
-    error.status = response.status;
-    throw error;
-  }
   try {
-    // 3.2.
     return await readBody(response);
   } catch (error) {
-    error.kind = 'format';
+    if (error.badBody) {
+      error.kind = 'format';
+    } else if (error.status) {
+      error.kind =
+        error.status >= 500 || error.status === 429
+          ? 'server'
+          : 'client';
+    }
+
     throw error;
   }
 }
