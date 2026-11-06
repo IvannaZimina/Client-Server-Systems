@@ -16,6 +16,8 @@ Mõõtmine tehti arvutis, millel on 8 protsessorituuma.
 | `blokeeriv`      |   2,4 ms |      88,0 ms |
 | `worker_threads` |   3,5 ms |       3,4 ms |
 
+---
+
 ### 2. Kerge päringu halvenemise arvutamine
 
 Koormuse all toimunud muutuse leidmiseks jagati koormuse all mõõdetud p95 vaikse olukorra p95 väärtusega.
@@ -29,6 +31,8 @@ Blokeeriva serveri kerge päringu latentsus suurenes koormuse all umbes 36,7 kor
 
 `worker_threads` serveri puhul olulist halvenemist ei toimunud. Kerge päringu latentsus jäi peaaegu samaks.
 See näitab, et raske arvutus peamises lõimes takistab teiste päringute töötlemist.
+
+---
 
 ### 3. Raskete tööde arv ja erinevus
 
@@ -44,24 +48,33 @@ Failis `materials/load-tool.js` luuakse iga raske päringu jaoks uus töötajal�
 Uue töötajalõime loomine, käivitamine ja lõpetamine võtab aega. Seetõttu kulub osa ajast töötaja haldamisele, mitte arvutamisele.
 `worker_threads` hoiab peamise lõime vabana, kuid iga päringu jaoks uue töötaja loomine vähendab raskete tööde läbilaskevõimet.
 
+---
+
 ### 4. Mõõteriista soojendus
 
 Failis `materials/load-tool.js` kasutatakse funktsioonis `measureLight()` enne mõõtmist viit kerget päringut.
-Soojendus on vajalik, sest esimene `fetch` võib võtta umbes 47 ms ühenduse ja päringu ettevalmistamise tõttu.
-Järgmiste päringute mediaan on umbes 0,7 ms.
+Soojendus on vajalik, sest esimene päring võib võtta rohkem aega ühenduse loomise ja päringu ettevalmistamise tõttu.
+Järgmiste päringute tulemused on stabiilsemad ja sobivad paremini serveri tegeliku latentsuse mõõtmiseks.
 
-Ilma soojenduseta oli kümne mõõtmise p95 umbes 53 ms.
-Sellisel juhul mõõdetaks osaliselt mõõteriista enda ettevalmistamise aega, mitte serveri tegelikku latentsust.
+Ilma soojenduseta võib esimese päringu ettevalmistamise aeg mõjutada mõõtmistulemust.
 Seetõttu tehakse enne mõõtmist viis päringut, mille tulemusi mõõtmises ei arvestata.
+
+---
 
 ### 5. Latentsuse ja läbilaskevõime kompromiss
 
 Latentsus näitab, kui kaua üks päring vastust ootab. Läbilaskevõime näitab, kui palju töid jõutakse teatud aja jooksul lõpetada.
+
 Mõõtmistulemustest selgus, et `worker_threads` hoidis kerge päringu latentsuse koormuse all peaaegu muutumatuna.
-Samal ajal jõudis see raskete tööde arvestuses teha vähem töid.
-Seega ei tähenda väiksem latentsus automaatselt suuremat läbilaskevõimet.
-Etteantud näites kirjeldatud mõõteriista parandamisel paranes latentsus 17 korda, kuid läbilaskevõime vähenes 11 korda.
-See näitab, et mõõtmisel tuleb arvestada mõlema näitajaga.
+Koormuse all oli blokeeriva serveri kerge päringu p95 latentsus 88,0 ms ja `worker_threads` serveril 3,4 ms.
+Seega oli `worker_threads` serveri latentsus umbes 25,9 korda väiksem.
+
+Samal ajal jõudis blokeeriv server lõpetada 46 rasket tööd, kuid `worker_threads` server ainult 4.
+Blokeeriv server lõpetas seega umbes 11,5 korda rohkem raskeid töid.
+
+See näitab, et väiksem latentsus ei tähenda automaatselt suuremat läbilaskevõimet. Mõõtmisel tuleb arvestada mõlema näitajaga.
+
+---
 
 ### 6. Ühe protsessi, cluster'i ja worker_threads'i võrdlus
 
@@ -76,6 +89,8 @@ Node.js rakenduse töö korraldamiseks saab kasutada erinevaid protsessimudeleid
 `cluster` võimaldab jagada päringuid mitme protsessi vahel, kuid ei kõrvalda ühe protsessi sisemist blokeerimist.
 `worker_threads` võimaldab teha protsessorimahukat tööd eraldi lõimes, nii et peamine lõim jääb vabaks.
 
+---
+
 ### 7. Töötajate kogumi kasutamine
 
 Iga päringu jaoks uue töötajalõime loomise asemel on parem kasutada töötajate kogumit (worker pool).
@@ -83,6 +98,8 @@ Töötajate kogum koosneb eelnevalt loodud töötajalõimedest, mis jäävad tö
 Uus ülesanne antakse vabale töötajalõimele. Pärast töö lõpetamist saab sama töötaja järgmise ülesande.
 Nii väheneb uute lõimede loomise ja lõpetamisega seotud lisakulu.
 Samuti saab piirata korraga töötavate ülesannete arvu ja hallata tööjärjekorda.
+
+---
 
 ### 8. Sobiva protsessimudeli valimine piletikassa tööde jaoks
 
@@ -96,6 +113,8 @@ Piletikassa rakenduse erinevate tööde jaoks sobivad erinevad mudelid.
 | Mahukad arvutused ja aruannete koostamine | `worker_threads` koos töötajate kogumiga | Arvutused toimuvad peamisest lõimest eraldi ega blokeeri kergete päringute töötlemist. |
 
 Sobiva mudeli valimisel arvestatakse töö iseloomu. I/O-põhiste tööde puhul piisab asünkroonsest töötlemisest, kuid protsessorimahukad arvutused vajavad eraldi töötajalõimi või protsesse.
+
+---
 
 ### 9. Mõõtmistulemuste kokkuvõte
 
@@ -112,4 +131,3 @@ Arvutis oli 8 protsessorituuma.
 Mõõtmine näitas, et eraldi töötajalõim kaitseb peamist lõime raske arvutuse ajal ja hoiab kergete päringute latentsuse madalana.
 Samas vähendas iga päringu jaoks uue töötajalõime loomine raskete tööde arvu. Püsiva koormuse korral on sobivam kasutada töötajate kogumit.
 Etteantud failid `materials/load-tool.js` ja `materials/worker.js` jäid muutmata.
-
