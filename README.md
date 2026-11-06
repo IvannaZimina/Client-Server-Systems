@@ -6,12 +6,13 @@ Repository containing practical assignments, checkpoints, and the ongoing compre
 
 ## Repository Structure & Monorepo Layout
 
-The repository follows a clean monorepo structure where each control work / milestone is isolated in its own dedicated directory while preserving its complete git history:
-
-- **`KT_1/`** — Introduction, requirements, role models, system overview, and development environment setup (Lectures 1–3 fundamentals)[cite: 31].
-- **`KT_2/`** — Client-side layer in depth: semantic HTML, accessibility, CSS architecture (layers, design tokens, responsive design), Vanilla JS, DOM state management, and event handling (*Piletikassa* ticket booking interface)[cite: 13, 31, 32].
-- **`KT_3/`** — Client-side logic, declarative array processing, object manipulation, closures, DOM performance benchmarks, and state-to-view architecture (*Piletikassa* event statistics and interactive test bench)[cite: 2, 6, 7, 14].
-- *Future `KT_4` through `KT_16` folders will be added sequentially as the course progresses.*
+The repository follows a monorepo structure. Each control work (KT) is stored in a separate directory.
+- `KT_1/` — Introduction, requirements, role models, system overview, and development environment setup.
+- `KT_2/` — Client-side development: semantic HTML, accessibility, CSS architecture, responsive design, Vanilla JavaScript, DOM state management, and event handling.
+- `KT_3/` — Client-side logic, array processing, object manipulation, closures, DOM performance benchmarks, and state-to-view architecture.
+- `KT_4/`–`KT_5/` — Client-server communication and related practical assignments.
+- `KT_6/` — Server-side development with Node.js: HTTP server, environment configuration, error handling, Express routing and middleware, streams, and process model measurements.
+- `KT_7/`–`KT_16/` — Additional course assignments and project milestones will be added as the course progresses.
 
 ---
 
@@ -59,5 +60,6 @@ Throughout the 16 lectures, all assignments contribute to building a single, rob
 
 1. Clone the monorepo:
    ```bash
-   git clone [https://github.com/IvannaZimina/Client-Server-Systems.git](https://github.com/IvannaZimina/Client-Server-Systems.git)
-   cd Client-Server-Systems
+    git clone https://github.com/IvannaZimina/Client-Server-Systems.git
+    cd Client-Server-Systems
+    ``` 
