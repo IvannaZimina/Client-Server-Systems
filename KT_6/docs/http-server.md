@@ -121,7 +121,8 @@ POST-päringu keha lugemiseks kasutatakse etteantud funktsiooni `readBody()` fai
 Keha suuruse piiriks määrati 1 MB ehk `1 000 000` baiti.
 Kui päringu keha ületab selle piiri, katkestatakse ühendus.
 Kontrollimiseks saadetakse 1,2 MB suurune päring.
-Oodatav tulemus on päringu katkestamine või vastuse kood `413`.
+1,2 MB suuruse päringu saatmisel ühendus katkes või server tagastas vastuse koodiga 413.
+Seejärel saadeti uus päring aadressile /api/events, millele server vastas koodiga 200.
 Pärast liiga suure päringu saatmist tehakse uus päring aadressile `/api/events`.
 Uus päring peab saama vastuse koodiga `200`.
 See näitab, et liiga suur päring ei lõpetanud serveri tööd.
