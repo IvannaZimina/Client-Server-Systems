@@ -111,7 +111,7 @@ Seda käsitleb funktsioon `installProcessGuards()`.
 
 ---
 
-**### Kontrollimise tulemused**
+### Kontrollimise tulemused
 
 Server käivitati edukalt käsuga `node --env-file=.env server/server.js`. Sõltuvuste puhas paigaldamine käsuga `npm ci` õnnestus.
 Tehti järgmised HTTP-päringud:
@@ -124,7 +124,8 @@ Tehti järgmised HTTP-päringud:
 | `GET /api/events/abc` |     422 | Tagastati teade `Vigane sündmuse ID`.                              |
 | `POST /api/orders`    |     409 | Täielikult müüdud sündmusele uue tellimuse lisamine lükati tagasi. |
 
-Veavastustes sisaldusid päringu ID ja vea detailid. Arenduskeskkonnas lisati vastustele ja logikirjetele ka `stack`.
+Kontrollitud käitusvigade vastustes sisaldusid päringu ID ja vea detailid.
+Arenduskeskkonnas lisati vastustele ja logikirjetele ka `stack`.
 `headersSent` kontrolli katsetamiseks lisati ajutine marsruut, mis saatis osa vastusest ja tekitas seejärel vea.
 Kontrollimisel tagastati algne HTTP-kood 200 ning Express sulges ühenduse ilma teist vastust saatmata.
 Pärast katset eemaldati ajutine marsruut failist `server/app.js`.
