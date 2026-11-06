@@ -21,12 +21,24 @@ kontrolli.
 `?err` annab staatuse 500 ja laadiks `server`. `?broken` annab staatuse 200,
 kuid JSON-i lugemine ebaõnnestub ja laadiks määratakse `format`.
 
+```javascript
+?err:
+status: 500
+kind: server
+
+?broken:
+status: 200
+kind: format
+```
 ---
 
 ### 4. Kontrolli, et võrguviga (`TypeError`) ei jõua kasutajani toorel kujul.
 
-Võrguviga muudetakse teateks `Ühendus puudub. Kontrolli võrku.`. Toores
-`TypeError` ei jõua kasutajaliidesesse.
+Võrguviga muudetakse teateks `Ühendus puudub. Kontrolli võrku.`.
+Toores `TypeError` ei jõua kasutajaliidesesse.
+```javascript
+{ state: 'err', message: 'Ühendus puudub. Kontrolli võrku.' }
+```
 
 ---
 
@@ -94,5 +106,5 @@ response.json()  -> VISKAB      laad: format
 `?broken` vastuse staatus on 200 ja keha suurus 20 baiti. Keha
 `{"events": [ KATKINE` ei ole kehtiv JSON.
 
-Mõõdetud aeg sisaldab ligikaudu 900 ms serveri viivitust ja päringu
-ülesehituse ning vastuse töötlemise umbes 196 ms lisakulu.
+Mõõdetud aeg oli 1,096 s, mis on umbes 196 ms rohkem kui serveri määratud 900 ms viivitus.
+Lisandub päringu ja vastuse töötlemise aeg.
