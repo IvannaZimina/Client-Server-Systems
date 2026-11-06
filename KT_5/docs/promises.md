@@ -2,8 +2,9 @@
 
 ### 1. Jooksuta ette antud `chain()` ja kirjuta tema jälg üles — see on ETALON.
 
-Etalonahela jälg on `sain sündmuse`, `lisasin hinna`, `finally`. Tulemuseks
-saadakse sündmus nimega `Sügiskontsert` ja hinnaga 24.
+Etalonahela jälg on `sain sündmuse`, `lisasin hinna`, `finally`.
+Tulemuseks saadakse objekt id-ga 1, sündmuse nimega `Sügiskontsert`
+ja hinnaga 24.
 
 ---
 
@@ -31,8 +32,10 @@ Kontroll `const r = (async () => 42)()` annab `r instanceof Promise: true` ja
 
 ### 5. VIHJE: lahknev jälg tähendab, et üks kahest ei tee seda, mida sa arvad.
 
-Erinev jälg näitab viga `await`-i kasutamises, veahalduses või `finally`-osas.
-Õige lahendus peab säilitama sündmuse, hinna ja jälje samas järjekorras.
+`chain()` ja `chainWithAwait()` jäljed peavad olema samad.
+Erinev jälg näitab, et üks kahest lahendusest ei tööta
+oodatud viisil. Võrdluse abil saab kontrollida `await`-i,
+veahalduse ja `finally` käitumist.
 
 ---
 
@@ -49,14 +52,21 @@ millisekundit, sest kolm tööd käivitatakse korraga.
 Ajad erinevad 3,01 korda (`280 / 93 = 3,01`). Järjestikune aeg on viivituste
 summa. `Promise.all` ootab kõige aeglasemat tööd, sest sõltumatud tööd
 käivitatakse korraga.
+Tegelik mõõdetud aeg võib olla veidi suurem taimerite ja programmi täitmise lisakulu tõttu.
 
 ---
 
 ### 8. Jooksuta `settleAll()` ühe kukkujaga ja näita, mis `all`-iga kaoks.
 
-`settleAll()` tagastab eraldi `fulfilled`- ja `rejected`-massivi. Seetõttu
+`settleAll()` tagastab eraldi `fulfilled`- ja `rejected`-massiivid. Seetõttu
 säilivad `seatmap` ja `prices`, kuigi `soodustused` ebaõnnestub.
 `Promise.all` lükkaks kogu lubaduse ühe vea tõttu tagasi.
+
+```javascript
+Timeout: Ajalõpp 50 ms
+Kohe pärast timeout-i: 0
+Pärast algse töö lõppu: 1
+```
 
 ---
 
@@ -87,4 +97,5 @@ fulfilled: ["seatmap", "prices"]
 rejected:  ["soodustused kukkusid"]
 ```
 
-`Promise.all`-iga kaoks terve leht, mitte ainult soodustuste riba.
+`Promise.all`-iga lükataks kogu tulemus ühe vea tõttu tagasi.
+Seetõttu ei saaks õnnestunud päringute tulemusi samast Promise'ist kätte.
