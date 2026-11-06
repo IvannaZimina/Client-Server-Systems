@@ -33,25 +33,23 @@ Kasutatakse funktsiooni `simpleResponse()`, mis määrab veale vastava HTTP-kood
 Veakäsitleja võtab vastu neli parameetrit: `err`, `req`, `res` ja `next`.
 Express tunneb veakäsitleja ära nelja parameetri järgi.
 Asünkroonsete marsruutide vigade edastamiseks kasutatakse etteantud funktsiooni `wrap()`.
-Näiteks vigane sündmuse ID tekitab vea koodiga `400`, mis jõuab üldisesse veakäsitlejasse.
+Ex3 algses versioonis tekitas vigane sündmuse ID vea koodiga `400`. Ex4 praeguses versioonis kasutatakse selle vea jaoks koodi `422`.
 Kui vastuse päised on juba saadetud, antakse viga edasi Expressi järgmisele veakäsitlejale.
 
 ---
 
 ### 4. Middleware'ide ja marsruutide järjekord
-
 Rakenduse middleware'id ja marsruudid on failis `server/app.js` järgmises järjekorras:
-1. `requestId()` — määrab päringule ID ja lisab selle vastuse päisesse.
-2. `logger(log)` — mõõdab päringu töötlemise aega ja kirjutab logi pärast vastuse lõppu.
+1. `requestId()` — määrab päringule ID ja lisab selle vastuse päisesse. See on esimene, sest ID peab olema olemas ka järgmiste middleware'ide ja võimalike vigade logimisel.
+2. `logger(log)` — mõõdab päringu töötlemise aega ja kirjutab logi pärast vastuse lõppu. See asub enne `express.json()` middleware'i, et logida ka vigase või liiga suure JSON-päringuga seotud vead, näiteks `413`.
 3. `express.json({ limit: '10kb' })` — loeb JSON-andmed ja kontrollib keha suurust.
 4. `express.static()` — võimaldab väljastada staatilisi faile.
 5. `/api/events` — sündmuste marsruuter.
 6. `/api/orders` — tellimuste marsruuter.
 7. `/api/health` — serveri tervisekontroll.
-8. `notFound` — tagastab `404`, kui ükski marsruut ei sobi.
-9. `errorHandler()` — käsitleb rakenduse käigus tekkinud vigu.
-
-Järjekord on oluline, sest Express töötleb middleware'e ja marsruute nende lisamise järjekorras.
+8. `notFound` — tagastab `404`, kui ükski marsruut ei sobi. See asub pärast marsruutereid, et kontrollida kõiki päringuid, millele vastust ei leitud.
+9. `errorHandler()` — käsitleb rakenduse käigus tekkinud vigu. See asub ahela lõpus, sest peab vastu võtma ka varasemate middleware'ide ja marsruutide edastatud vead.
+Express töötleb middleware'e ja marsruute nende lisamise järjekorras. Seetõttu mõjutab järjekord seda, millised middleware'id päringut töötlevad ja kuidas vead käsitletakse.
 
 ---
 
@@ -100,103 +98,75 @@ Kontrollimisel tagastatakse üks sündmus nimega `Talveball`.
 ---
 
 ### 8. HTTP vastusekoodid
-
 Marsruutides kasutatakse järgmisi vastusekoode:
 - `201 Created` — tellimus loodi edukalt. Vastuses on tellimuse andmed ja päis `Location`, mis sisaldab loodud tellimuse aadressi.
 - `204 No Content` — tellimus kustutati. Vastuse keha on tühi.
-- `400 Bad Request` — sündmuse ID ei ole korrektne number.
+- `400 Bad Request` — Ex3 algses versioonis kasutati seda sündmuse ID vale vormingu korral.
 - `404 Not Found` — sündmust, tellimust või marsruuti ei leitud.
 - `409 Conflict` — sündmus on välja müüdud või vabu kohti ei jätku.
-- `422 Unprocessable Content` — tellimuse sisendandmed on vigased või sündmust ei ole olemas.
-
+- `422 Unprocessable Content` — tellimuse sisendandmed on vigased või sündmuse ID ei vasta nõuetele. Ex4 praeguses versioonis käsitletakse vigast sündmuse ID-d veana `InvalidInput`, mille vastusekood on `422`.
+  
 Staatus `409` tähistab olukorda, kus sisendandmed on korrektsed, kuid olemasolev seisund ei võimalda toimingut teha.
 
 ---
 
 ### 9. Marsruutide kontrollimine curl-käskudega
 
-Käsitsi kontrollimiseks käivitatakse server käsuga `node server/start.js`.
-Sündmuste nimekirja päring:
+Marsruutide kontrollimiseks kasutati Windows CMD käsureal `curl.exe` käske.
+Käsud saadavad päringuid serverile aadressil `http://localhost:3006`.
+
+**GET-päringud**
 ```cmd
 curl.exe -i http://localhost:3006/api/events
-```
-
-Sündmuste otsimine:
-```cmd
 curl.exe -i "http://localhost:3006/api/events?search=kontsert"
+curl.exe -i http://localhost:3006/api/events/99
+curl.exe -i http://localhost:3006/api/health
+curl.exe -i -H "X-Request-Id: minu-id" http://localhost:3006/api/health
 ```
-
-Uue tellimuse loomine — `201` ja `Location`:
+**POST-päringud**
+Uue tellimuse loomine:
 ```cmd
 curl.exe -i -X POST http://localhost:3006/api/orders -H "Content-Type: application/json" -d "{\"event\":3,\"qty\":2}"
 ```
-
-Vigased tellimuse andmed — `422`:
+Vigaste andmetega päring:
 ```cmd
 curl.exe -i -X POST http://localhost:3006/api/orders -H "Content-Type: application/json" -d "{\"event\":\"x\"}"
 ```
-
-Välja müüdud sündmus — `409`:
+Veel ühe tellimuse loomine:
 ```cmd
 curl.exe -i -X POST http://localhost:3006/api/orders -H "Content-Type: application/json" -d "{\"event\":2,\"qty\":1}"
 ```
-
-Tellimuse kustutamine — `204`:
-```cmd
-curl.exe -i -X DELETE http://localhost:3006/api/orders/9001
-```
-
-Teine kustutamine — `404`:
-```cmd
-curl.exe -i -X DELETE http://localhost:3006/api/orders/9001
-```
-
-Kustutamise käskudes kasutatakse tellimuse ID-d, mis saadi tellimuse loomise vastusest. Kui saadud ID erineb näites kasutatud väärtusest `9001`, asendatakse see tegeliku ID-ga.
-
-Olematu sündmus — `404`:
-```cmd
-curl.exe -i http://localhost:3006/api/events/99
-```
-
-Liiga suure päringu kontrollimiseks luuakse esmalt 20 000 märgiga JSON-fail:
-```cmd
-node -e "require('fs').writeFileSync('large.json', JSON.stringify({event:3,qty:1,note:'x'.repeat(20000)}))"
-```
-
-Seejärel saadetakse see serverile:
+Liiga suure JSON-päringu kontrollimine:
 ```cmd
 curl.exe -i -X POST http://localhost:3006/api/orders -H "Content-Type: application/json" --data-binary "@large.json"
 ```
-
-Oodatav vastuse kood on `413`.
-Pärast kontrolli võib faili kustutada:
-
+**DELETE-päringud**
+Tellimuse kustutamine. Kui tellimuse ID on teistsugune, tuleb käsus `9001` asendada tegeliku ID-ga:
 ```cmd
-del large.json
+curl.exe -i -X DELETE http://localhost:3006/api/orders/9001
+curl.exe -i -X DELETE http://localhost:3006/api/orders/9001
 ```
-
-Päringu ID kontrollimiseks:
-```cmd
-curl.exe -i http://localhost:3006/api/health
-```
-
-Kliendi enda ID kontrollimiseks:
-```cmd
-curl.exe -i -H "X-Request-Id: minu-id" http://localhost:3006/api/health
-```
-
-Vastuse päises peab olema `X-Request-Id: minu-id`.
+Teist päringut kasutatakse kustutatud tellimuse uuesti kustutamise kontrollimiseks.
+**Kontrollimise tulemused**
+Päringute abil kontrolliti:
+- sündmuste nimekirja ja otsingut;
+- üksiku sündmuse päringut;
+- tellimuse loomist õigete ja vigaste andmetega;
+- tellimuse kustutamist ja juba kustutatud tellimuse uuesti kustutamist;
+- liiga suure JSON-päringu tagasilükkamist;
+- tervisekontrolli marsruuti;
+- päringu ID edastamist `X-Request-Id` päise kaudu.
+Päringute vastustest kontrolliti HTTP olekukoode ja vastuse sisu.
 
 ---
 
 ### Süstitud defektid ja nende tagajärjed
-
 | Defekt                          | Tagajärg                                                                              |
 | ------------------------------- | ------------------------------------------------------------------------------------- |
 | `express.json()` eemaldati      | `req.body` on `undefined` ja kaheksa kontrolli ebaõnnestuvad.                         |
 | `/popular` marsruut eemaldati   | `popular` käsitletakse parameetrina `:id`, seega populaarse sündmuse päring ei tööta. |
 | `requestId()` eemaldati         | `X-Request-Id` puudub vastuse päisest ja päringu ID ei ole saadaval.                  |
-| `204` asendati `200`-ga         | Kustutamise vastuse staatus ei vasta nõudele.                                         |
+| `204` asendati `200`-ga         | Vastuse keha oli 11 baiti, kuigi `204 No Content` korral oodatakse 0 baiti.           |
 | Kohtade arvu kontroll eemaldati | Välja müüdud sündmusele saab tellimuse teha ja ülemüük läheb läbi.                    |
 
 ### Oodatav tulemus
