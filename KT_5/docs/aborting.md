@@ -53,24 +53,48 @@ võrguvea või `TimeoutError`-i korral, kui meetod on `GET`. Staatuste `400` ja
 
 `requestWithRetry()` teeb esimese päringu ja kordab ainult `shouldRetry()` poolt
 lubatud olukordi. Õnnestumise korral tagastatakse vastus koos katsete arvuga.
-Mõõdetud katsed olid vastavalt stsenaariumidele `3, 1, 1, 3, 1, 2`.
+Mõõdetud katsed olid vastavalt stsenaariumidele `3, 1, 3, 1, 1, 1, 2, 1`.
 Kui kõik katsed ebaõnnestuvad, antakse viimane viga kutsujale edasi.
 
 ---
 
 ### 8. Jooksuta serveri `?retry` vastu ja kirjuta koodide jada üles.
 
-Etteantud serveri `?retry` stsenaarium annab esimesele kahele päringule
-staatuse 503. Kolmas päring annab staatuse 200, sest server lubab iga kolmanda
-katse läbi.
-
----
+Server annab iga kolmanda päringu korral staatuse 200. Ülejäänud päringud saavad staatuse 503. Tegin kaks eraldi `requestWithRetry()` kutset, mõlemas oli maksimaalselt kolm katset.
 
 ### 9. Lisa pausile juhuslikkus (jitter) ja kirjuta kahe kliendi kolm pausi üles.
 
-Kasvavad põhipausid on 200, 400 ja 800 millisekundit. Jitter lisab pausile
-juhusliku osa, mistõttu eri kliendid ei korda päringuid täpselt samal hetkel.
-Selline hajutamine vähendab serveri uut ülekoormust.
+Jitter lisab põhipausile juhusliku osa. Testisin kahte klienti nelja päringuga. Mõlemad said pärast kolme kordamist vastuse 200.
+
+## Mõõdetud tulemus
+
+### Serveri `?retry`
+
+```text
+503 503 200 503 503 200
+```
+
+Mõlemad `requestWithRetry()` kutsed õnnestusid kolmandal katsel.
+
+### Jitteriga pausid
+
+| Klient   | 1. paus (ms) | 2. paus (ms) | 3. paus (ms) |
+| -------- | -----------: | -----------: | -----------: |
+| Client A |          206 |          464 |          862 |
+| Client B |          236 |          437 |          862 |
+
+### Kordamine võltsitud fetch-iga
+
+| Stsenaarium                         | Päringuid | Tulemus           |
+| ----------------------------------- | --------: | ----------------- |
+| 503, 503, 200                       |         3 | 200               |
+| 404                                 |         1 | 404 (ei korratud) |
+| POST: 503                           |         1 | 503 (ei korratud) |
+| Võrguviga x3                        |         3 | TypeError         |
+| POST: võrguviga                     |         1 | TypeError         |
+| Kasutaja katkestas                  |         1 | AbortError        |
+| Ajalõpp x2                          |         2 | TimeoutError      |
+| Väline signaal oli juba katkestatud |         1 | Viga, ei korratud |
 
 ---
 
@@ -84,14 +108,14 @@ Selline hajutamine vähendab serveri uut ülekoormust.
 
 ## Kordamine võltsitud fetch-iga
 
-| stsenaarium | päringuid | tulemus |
-|---|---:|---|
-| 503, 503, 200 | 3 | 200 |
-| 404 | 1 | 404 (ei korratud) |
-| POST: 503, 201 | 1 | 503 (ei korratud) |
-| võrguviga x3 | 3 | viskas |
-| kasutaja katkestas | 1 | AbortError |
-| ajalõpp x2 | 2 | TimeoutError |
+| stsenaarium        | päringuid | tulemus           |
+| ------------------ | --------: | ----------------- |
+| 503, 503, 200      |         3 | 200               |
+| 404                |         1 | 404 (ei korratud) |
+| POST: 503, 201     |         1 | 503 (ei korratud) |
+| võrguviga x3       |         3 | viskas            |
+| kasutaja katkestas |         1 | AbortError        |
+| ajalõpp x2         |         2 | TimeoutError      |
 
 ## Kasvav ooteaeg ja juhuslikkus
 
