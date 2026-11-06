@@ -18,6 +18,16 @@ käivitamist`.
 `pyramid(callback)` prognoos: kolm järjestikust `5 ms` taimerit ja tulemus
 `callback(null, "valmis")`.
 
+`block(250)` prognoos: funktsioon blokeerib JavaScripti lõime
+ligikaudu 250 ms jooksul ja tagastab tegelikult mõõdetud aja.
+
+## Lisafunktsioonide kontroll
+
+`block(250)` tulemus: 250 ms.
+
+`pyramid(callback)` tulemus: `null, valmis`.
+Kolm järjestikust taimerit käivitati ja pärast neid kutsuti välja callback.
+
 ---
 
 ### 2. Jooksuta `threeQueues()` ja pane viis rida õigesse järjekorda.
@@ -40,7 +50,7 @@ käivitamist.
 
 ### 4. Märgi iga koht, kus sinu ennustus EI klappinud, ja kirjuta põhjus.
 
-Mõõdetud väljundid klappisid prognoosidega. Kõige rohkem kahtlust tekitas
+Mõõdetud väljundid klappisid prognoosidega. Kõige rohkem küsimusi tekitas
 `setTimeout(..., 0)`, kuid `threeQueues()` kinnitas, et taimer käivitub pärast
 sünkroonset koodi ja mikrotöid.
 
@@ -58,6 +68,9 @@ mikrotööde lõpetamist.
 
 Lubatud aeg on 100 millisekundit. Käivitamisel mõõdeti tegelikuks ajaks
 250 millisekundit, sest taimer käivitub pärast blokeeriva tsükli lõppu.
+```javascript
+delay(100, 250): { allowed: 100, actual: 250 }
+```
 
 ---
 
@@ -70,7 +83,26 @@ taimeri funktsioon saab käivituda alles pärast lõime vabanemist.
 
 ### 8. Võrdle tagasikutset ja lubadust: pesastamine, viga, tagastusväärtus.
 
-Pesastatud tagasikutsed moodustavad püramiidi ning iga tase vajab eraldi
-veakontrolli (`callback-hell`). Lubaduste ahel ühendab sammud järjest, edastab vead automaatselt
-ja annab iga sammu tagastusväärtuse järgmisele sammule.
+Pesastatud tagasikutsed moodustavad kergesti sügava püramiidi
+ehk callback-hell. Promise'i puhul saab järjestikused tegevused
+ühendada `.then()`-ahelaks.
 
+Tagasikutse puhul tuleb viga kontrollida igas sammus eraldi.
+Promise'i ahelas liigub viga edasi kuni `.catch()`-meetodini,
+kus seda saab käsitleda.
+
+Tagasikutse tagastusväärtus ei jõua automaatselt algse funktsioonini.
+Promise'i puhul saab `.then()` tagastada uue väärtuse või Promise'i,
+mida järgmine ahela samm kasutab.
+
+## 9. Event Loop'i kasutamine piletikassas
+
+1. Piletite laadimine: `fetch()` abil saab serverist piletite info
+laadida ilma kasutajaliidest blokeerimata.
+
+2. Ostu kinnitamine: serveri vastust saab oodata Promise'i abil.
+Selle aja jooksul jääb kasutajaliides kasutatavaks.
+
+3. Otsing ja filtrid: kasutaja sisestatud otsingut saab viivitusega
+käivitada, näiteks `setTimeout()` abil, et päringut ei saadetaks
+iga klahvivajutuse peale.
