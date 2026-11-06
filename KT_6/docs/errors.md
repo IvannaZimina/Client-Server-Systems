@@ -13,49 +13,61 @@ Failis `server/errors.js` loodi kolm klassi, mis pärivad klassist `RuntimeError
 `RuntimeError` ja funktsioon `isRuntimeError()` pärinevad etteantud failist `materials/runtime-error.js`.
 Markeri abil eristatakse oodatavaid käitusvigu programmivigadest.
 
+---
+
 ### 2. Funktsioon makeErrorResponse()
 
 Funktsioon `makeErrorResponse({ isDev })` loodi failis `server/errors.js`.
-
 Käitusvea korral kasutatakse vea enda HTTP-koodi ja teadet.
 Programmivea korral tagastatakse kood 500 ja üldine teade `Serveri sisemine viga`.
-
 Vastus sisaldab päringu ID-d ja võimaluse korral vea detaili.
 Arenduskeskkonnas kuvatakse ka vea pinu (`stack`), tootmiskeskkonnas seda ei avaldata.
 Logikirjesse lisatakse vea tüüp, teade, päringu ID ja marsruut.
 
+---
+
 ### 3. Parameetri headersSent kontrollimine
 
 Etteantud failis `materials/error-middleware.js` kontrollitakse `res.headersSent` väärtust.
-
 Kui vastus on juba saadetud, ei saa enam muuta selle HTTP-koodi ega saata uut vastust.
 Seetõttu antakse viga edasi funktsiooniga `next(err)`, mille järel Expressi vaikimisi veakäsitleja sulgeb ühenduse.
 
-### 4. Veapinu kuvamine
+---
 
 **### 4. Veapinu kuvamine**
 
-Arenduskeskkonnas kuvatakse veapinu (\`stack\`), mis aitab leida vea asukoha koodis.
-Tootmiskeskkonnas veapinu kliendile ei avaldata.
-Käitusvigade korral säilib konkreetne veateade, programmivigade korral tagastatakse üldine teade \`Serveri sisemine viga\`.
+Arenduskeskkonnas kuvatakse veapinu (`stack`), mis aitab leida vea asukoha koodis.
+Tootmiskeskkonnas seda kliendile ei avaldata, sest veapinu võib paljastada failide asukohti, rakenduse sisemist struktuuri ja tehnilisi üksikasju.
+Selline teave võib aidata ründajal rakenduse nõrkusi tuvastada.
+Programmivea korral tagastatakse kliendile üldine teade `Serveri sisemine viga`, käitusvea korral säilib konkreetne veateade.
+
+---
 
 ### 5. Päringu ID kasutamine
 
 Middleware `requestId()` määrab igale päringule ID ja salvestab selle `req.id` sisse. ID lisatakse ka vastuse päisesse.
-
 Sama ID kasutatakse veavastuses ja logikirjes. Nii saab kliendi saadud veateate siduda serveri logiga.
+
+---
 
 ### 6. Protsessikaitsed
 
-Funktsioon `installProcessGuards()` lisati failis `server/server.js` serveri käivitamise algusesse.
+Etteantud funktsioon `installProcessGuards()` kutsuti välja failis `server/server.js` serveri käivitamise alguses.
 See jälgib sündmusi `uncaughtException` ja `unhandledRejection`.
-Sellise vea korral salvestatakse logisse vea teave ja protsess lõpetatakse koodiga 1.
-Püüdmatuks jäänud programmiviga võib jätta rakenduse määramata olekusse. Seetõttu ei jätkata sellises olukorras serveri tööd.
+
+Sellise vea korral salvestatakse logisse vea teave ning protsess lõpetatakse koodiga 1.
+Pärast püüdmatut erindit võib rakenduse olek olla määramata ja järgmised päringud võivad anda valesid vastuseid.
+Seetõttu ei jätkata serveri tööd. Protsessi taaskäivitamine jääb protsessihalduri ülesandeks.
+
+---
 
 ### 7. Konfiguratsiooni kontrollimine
 
-Funktsiooni `readConfig()` kasutatakse enne serveri käivitamist. See kontrollib vajalikke keskkonnamuutujaid ja pordi väärtust.
-Vigase konfiguratsiooni korral peatub käivitamine enne päringute vastuvõtmist. Nii ei tööta server puudulike seadistustega.
+Funktsiooni `readConfig()` kasutatakse failis `server/server.js` enne serveri käivitamist. See kontrollib kohustuslikke keskkonnamuutujaid `DB_URL` ja `SESSION_SECRET` ning pordi `PORT` väärtust.
+
+Vigase või puuduva konfiguratsiooni korral visatakse viga ja serveri käivitamine peatub enne päringute vastuvõtmist. Selline lähenemine järgib põhimõtet *fail fast*: konfiguratsiooniviga avastatakse kohe käivitamisel, mitte alles pärast seda, kui server on juba mõnda aega tootmiskeskkonnas töötanud.
+
+---
 
 ### 8. Serveri käivitamine ja skriptid
 
@@ -67,6 +79,8 @@ Faili `package.json` lisati järgmised skriptid:
 - `dev` — serveri käivitamine automaatse taaskäivitamisega;
 - `test` — Node.js testimisvahendi käivitamine;
 - `audit` — sõltuvuste turvakontroll.
+
+---
 
 ### 9. Node.js sisseehitatud tööriistad
 
@@ -81,16 +95,23 @@ Eraldi pakettide asemel kasutati Node.js ja npm sisseehitatud võimalusi.
 
 Sõltuvuste paigaldamiseks kasutati käsku `npm ci`, mis paigaldab paketid `package-lock.json` faili järgi.
 
+---
+
 ### 10. Käitusvea ja programmivea erinevus
 
-|             | Käitusviga                         | Programmiviga                        |
-| ----------- | ---------------------------------- | ------------------------------------ |
-| Näide       | Puuduv kirje, vigased sisendandmed | `undefined.foo`, programmeerimisviga |
-| Oodatav?    | Jah                                | Ei                                   |
-| Käsitlemine | Vastus ja töö jätkamine            | Logimine ja protsessi lõpetamine     |
-| Kliendile   | Vea tegelik teade                  | `Serveri sisemine viga`              |
+|             | Käitusviga                                                   | Programmiviga                                                         |
+| ----------- | ------------------------------------------------------------ | --------------------------------------------------------------------- |
+| Näide       | Puuduv kirje, vigased sisendandmed                           | `undefined.foo`, programmeerimisviga                                  |
+| Oodatav?    | Jah                                                          | Ei                                                                    |
+| Käsitlemine | Veakood ja teade tagastatakse kliendile. Server jätkab tööd. | Expressi kaudu käsitlemisel tagastatakse HTTP 500 ja üldine veateade. |
+| Kliendile   | Konkreetne veateade                                          | `Serveri sisemine viga`                                               |
 
-### Kontrollimise tulemused
+Püüdmatute vigade (`uncaughtException` ja `unhandledRejection`) korral logitakse vea teave ning protsess lõpetatakse koodiga 1.
+Seda käsitleb funktsioon `installProcessGuards()`.
+
+---
+
+**### Kontrollimise tulemused**
 
 Server käivitati edukalt käsuga `node --env-file=.env server/server.js`. Sõltuvuste puhas paigaldamine käsuga `npm ci` õnnestus.
 Tehti järgmised HTTP-päringud:
@@ -104,15 +125,12 @@ Tehti järgmised HTTP-päringud:
 | `POST /api/orders`    |     409 | Täielikult müüdud sündmusele uue tellimuse lisamine lükati tagasi. |
 
 Veavastustes sisaldusid päringu ID ja vea detailid. Arenduskeskkonnas lisati vastustele ja logikirjetele ka `stack`.
-
 `headersSent` kontrolli katsetamiseks lisati ajutine marsruut, mis saatis osa vastusest ja tekitas seejärel vea.
 Kontrollimisel tagastati algne HTTP-kood 200 ning Express sulges ühenduse ilma teist vastust saatmata.
 Pärast katset eemaldati ajutine marsruut failist `server/app.js`.
-
 Etteantud failid `materials/runtime-error.js`, `materials/error-middleware.js` ja `materials/process-guards.js` jäid muutmata.
 Käsk `npm test` käivitus edukalt, kuid projektis testifaile ei leitud. Seetõttu käivitati 0 testi.
 Käsk `npm run audit` lõpetas kontrolli tulemusega `found 0 vulnerabilities`. Sõltuvustes teadaolevaid turvaauke ei leitud.
-
-Tootmiskeskkonnas kontrolliti päringut \`GET /api/events/999\`.
-Vastus oli 404 ning sisaldas päringu ID-d ja vea detaili, kuid mitte \`stack\`-välja.
+Tootmiskeskkonnas kontrolliti päringut "`GET /api/events/999`".
+Vastus oli 404 ning sisaldas päringu ID-d ja vea detaili, kuid mitte `stack`-välja.
 Serveri logikirjes kasutati sama päringu ID-d.
