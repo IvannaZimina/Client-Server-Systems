@@ -1,16 +1,15 @@
-// C06 Ex3 — Express routes
+
+// C06 Ex4 — Express routes with custom errors
 
 import express from 'express';
 import { wrap } from '../materials/express-helpers.js';
 
-// Ошибка с HTTP-статусом для общего обработчика ошибок
-function httpError(code, message) {
-  const error = new Error(message);
-  error.status = code;
-  return error;
-}
+import {
+  NotFound,
+  InvalidInput,
+  Conflict
+} from './errors.js';
 
-// Маршруты событий
 export function eventsRouter(store) {
   const router = express.Router();
 
@@ -20,7 +19,6 @@ export function eventsRouter(store) {
     res.json(events);
   }));
 
-  // Конкретный маршрут должен быть раньше /:id
   // GET /api/events/popular
   router.get('/popular', wrap(async (req, res) => {
     const event = await store.event(2);
@@ -30,13 +28,19 @@ export function eventsRouter(store) {
   // GET /api/events/:id
   router.get('/:id', wrap(async (req, res) => {
     if (!/^\d+$/.test(req.params.id)) {
-      throw httpError(400, 'Vigane sündmuse ID');
+      throw new InvalidInput(
+        'Vigane sündmuse ID',
+        { id: req.params.id }
+      );
     }
 
     const event = await store.event(Number(req.params.id));
 
     if (!event) {
-      throw httpError(404, 'Sündmust ei leitud');
+      throw new NotFound(
+        'Sündmust ei leitud',
+        { id: Number(req.params.id) }
+      );
     }
 
     res.json(event);
@@ -45,7 +49,10 @@ export function eventsRouter(store) {
   // PATCH /api/events/:id
   router.patch('/:id', wrap(async (req, res) => {
     if (!/^\d+$/.test(req.params.id)) {
-      throw httpError(400, 'Vigane sündmuse ID');
+      throw new InvalidInput(
+        'Vigane sündmuse ID',
+        { id: req.params.id }
+      );
     }
 
     const event = await store.updateEvent(
@@ -54,7 +61,10 @@ export function eventsRouter(store) {
     );
 
     if (!event) {
-      throw httpError(404, 'Sündmust ei leitud');
+      throw new NotFound(
+        'Sündmust ei leitud',
+        { id: Number(req.params.id) }
+      );
     }
 
     res.json(event);
@@ -63,7 +73,6 @@ export function eventsRouter(store) {
   return router;
 }
 
-// Маршруты заказов
 export function ordersRouter(store) {
   const router = express.Router();
 
@@ -77,7 +86,7 @@ export function ordersRouter(store) {
   router.post('/', wrap(async (req, res) => {
     const body = req.body;
 
-    // Проверка обязательных полей
+    // Kohustuslike väljade kontroll
     if (
       !body ||
       typeof body !== 'object' ||
@@ -85,8 +94,7 @@ export function ordersRouter(store) {
       body.event === undefined ||
       body.qty === undefined
     ) {
-      throw httpError(
-        422,
+      throw new InvalidInput(
         'Puuduvad kohustuslikud väljad: event, qty'
       );
     }
@@ -94,25 +102,37 @@ export function ordersRouter(store) {
     const eventId = Number(body.event);
     const qty = Number(body.qty);
 
-    // Проверка значений
+    // Sisendandmete kontroll
     if (
       !Number.isInteger(eventId) ||
       !Number.isInteger(qty) ||
       qty < 1
     ) {
-      throw httpError(422, 'Vigased tellimuse andmed');
+      throw new InvalidInput(
+        'Vigased tellimuse andmed',
+        { event: body.event, qty: body.qty }
+      );
     }
 
     const event = await store.event(eventId);
 
-    // Несуществующее событие — ошибка входных данных
     if (!event) {
-      throw httpError(422, 'Sündmust ei leitud');
+      throw new NotFound(
+        'Sündmust ei leitud',
+        { event: eventId }
+      );
     }
 
-    // Недостаточно свободных мест — конфликт состояния
+    // Vabade kohtade kontroll
     if (event.sold + qty > event.seats) {
-      throw httpError(409, 'Vabu kohti ei ole piisavalt');
+      throw new Conflict(
+        'Vabu kohti ei ole piisavalt',
+        {
+          event: eventId,
+          requested: qty,
+          available: event.seats - event.sold
+        }
+      );
     }
 
     const order = await store.addOrder({
@@ -129,13 +149,19 @@ export function ordersRouter(store) {
   // DELETE /api/orders/:id
   router.delete('/:id', wrap(async (req, res) => {
     if (!/^\d+$/.test(req.params.id)) {
-      throw httpError(404, 'Tellimust ei leitud');
+      throw new InvalidInput(
+        'Vigane tellimuse ID',
+        { id: req.params.id }
+      );
     }
 
     const removed = await store.removeOrder(Number(req.params.id));
 
     if (!removed) {
-      throw httpError(404, 'Tellimust ei leitud');
+      throw new NotFound(
+        'Tellimust ei leitud',
+        { id: Number(req.params.id) }
+      );
     }
 
     res.status(204).end();
