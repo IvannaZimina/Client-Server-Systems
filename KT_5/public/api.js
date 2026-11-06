@@ -7,12 +7,45 @@ export class ApiError extends MaterialApiError {}
 // 5.1.
 export function toApiError(error) {
   if (error instanceof ApiError) return error;
+
+  const reason = error ?? null;
+  const message = error?.message ?? 'Unknown API error';
+
   // 5.2.
-  if (error?.name === 'AbortError') return new ApiError(error.message, { kind: 'abort' });
-  if (error?.name === 'TimeoutError') return new ApiError(error.message, { kind: 'timeout' });
-  if (error?.kind) return new ApiError(error.message, { kind: error.kind, status: error.status });
-  if (error instanceof TypeError) return new ApiError(error.message, { kind: 'network' });
-  return new ApiError(error?.message ?? 'Unknown API error', { kind: 'format' });
+  if (error?.name === 'AbortError') {
+    return new ApiError(message, {
+      kind: 'abort',
+      reason,
+    });
+  }
+
+  if (error?.name === 'TimeoutError') {
+    return new ApiError(message, {
+      kind: 'timeout',
+      reason,
+    });
+  }
+
+  if (error?.kind) {
+    return new ApiError(message, {
+      kind: error.kind,
+      status: error.status ?? null,
+      reason,
+    });
+  }
+
+  if (error instanceof TypeError) {
+    return new ApiError(message, {
+      kind: 'network',
+      reason,
+    });
+  }
+
+  return new ApiError(message, {
+    kind: 'format',
+    status: error?.status ?? null,
+    reason,
+  });
 }
 
 // 5.6.
@@ -39,6 +72,7 @@ export function makeApi({
   async function ask(path, options = {}) {
     const { signal: outerSignal, ...requestOptions } = options;
     const signal = timeoutSignal(timeout, outerSignal);
+
     try {
       // 5.5.
       const response = await fetchFn(base + path, {
@@ -50,12 +84,21 @@ export function makeApi({
           ...options.headers,
         },
       });
+
       if (!response.ok) {
         // 5.7.
         const body = await response.json().catch(() => ({}));
-        const kind = response.status >= 500 || response.status === 429 ? 'server' : 'client';
-        throw new ApiError(body.err ?? `HTTP ${response.status}`, { kind, status: response.status });
+        const kind =
+          response.status >= 500 || response.status === 429
+            ? 'server'
+            : 'client';
+
+        throw new ApiError(body.err ?? `HTTP ${response.status}`, {
+          kind,
+          status: response.status,
+        });
       }
+
       // 5.8.
       return await parseBody(response);
     } catch (error) {
@@ -64,15 +107,27 @@ export function makeApi({
       signal.clear();
     }
   }
+
   return {
-    async events(search = '') {
+    async events(search = '', options = {}) {
       const query = search ? `?search=${encodeURIComponent(search)}` : '';
-      return (await ask(`/events${query}`)).map(toEvent);
+      return (await ask(`/events${query}`, options)).map(toEvent);
     },
-    async event(id) { return toEvent(await ask(`/events/${id}`)); },
-    seatmap(id) { return ask(`/events/${id}/seatmap`); },
-    buyTickets(event, qty) {
-      return ask('/orders', { method: 'POST', body: JSON.stringify({ event, qty }) });
+
+    async event(id, options = {}) {
+      return toEvent(await ask(`/events/${id}`, options));
+    },
+
+    seatmap(id, options = {}) {
+      return ask(`/events/${id}/seatmap`, options);
+    },
+
+    buyTickets(event, qty, options = {}) {
+      return ask('/orders', {
+        ...options,
+        method: 'POST',
+        body: JSON.stringify({ event, qty }),
+      });
     },
   };
 }
