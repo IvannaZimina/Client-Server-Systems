@@ -1,15 +1,17 @@
 # C07 — Ülesanne 3: Filter, otsing, sort ja lehekülg
 
-## 1. Lubatud sortimis- ja filtreerimisväljad
+## 1. Kirjuta SORTABLE ja FILTERABLE piletikassa järgi: free (vabad kohad) on ARVUTATUD väli, mida sündmuse real ei ole, ja suund tuleb miinusest (-price), mitte eraldi parameetrist.
 
 Failis `server/query.js` määrati lubatud väljad:
 - Sortimine: `start`, `name`, `price`, `free`.
 - Filtreerimine: `venue`, `min_price`, `max_price`, `free_at_least`.
 Väli `free` arvutatakse väärtuste `seats - sold` põhjal, sest sündmuse kirjes seda välja eraldi ei ole.
+Sorteerimise suund määratakse miinusmärgiga, näiteks `-price` tähendab hinna järgi sorteerimist kahanevas järjekorras.
+Eraldi suuna parameetrit ei kasutata.
 
 ---
 
-## 2. Tundmatu sortimisvälja kontroll
+## 2. Tundmatu sortimisväli peab andma VEA, mille fields.sort NIMETAB lubatud väärtused — klient näeb kohe, mida tohib.
 
 Failis `materials/check-query.js` kontrolliti funktsiooni `readSort()`.
 Sisendiga `sort=password` peab funktsioon vea viskama ja lisama `fields.sort` väljale lubatud sortimisväljade loendi.
@@ -17,7 +19,7 @@ Samuti kontrolliti SQL-i laadset sisendit `price; DROP TABLE`, mille funktsioon 
 
 ---
 
-## 3. Lehekülje suuruse piirang
+## 3. Kontrolli antud readPage() lage päringuga ?per=1000000 ja otsusta, kas lagi 100 sobib piletikassa nimekirjale.
 
 Failis `server/read-page.js` on määratud:
 - `PAGE_DEFAULT = 20`
@@ -27,10 +29,9 @@ Tulemuseks saadi `per = 100`. Selline piirang sobib piletikassa sündmuste nimek
 
 ---
 
-## 4. Millal tekib viga ja millal kasutatakse vaikeväärtust
+## 4. Otsusta iga vigase sisendi kohta: viga või vaikeväärtus, ja põhjenda.
 
 Failis `materials/check-query.js` kontrolliti vigaseid lehekülje ja päringu suuruse väärtusi.
-
 | Sisend             | Tulemus           | Põhjendus                                         |
 | ------------------ | ----------------- | ------------------------------------------------- |
 | `page=abc`         | Vaikeväärtus `1`  | Vigane leheküljenumber ei pea päringut katkestama |
@@ -41,10 +42,9 @@ Failis `materials/check-query.js` kontrolliti vigaseid lehekülje ja päringu su
 
 ---
 
-## 5. Vigaste filtrite kontroll
+## 5. VIHJE: viska siis, kui vigane väärtus muudaks TULEMUSE valeks.
 
 Failis `materials/check-query.js` kontrolliti funktsiooni `readFilters()` järgmiste sisenditega:
-
 | Kontroll                      | Sisend                | Tulemus                      |
 | ----------------------------- | --------------------- | ---------------------------- |
 | Koha järgi filtreerimine      | `venue: 'Estonia'`    | `{ venue: 'Estonia' }`       |
@@ -60,7 +60,7 @@ Tundmatud parameetrid ja tühjad väärtused jäetakse vahele.
 
 ---
 
-## 6. Päringu plaani loomine
+## 6. Kirjuta createPlan(), mis ei tea midagi SQL-ist ega mälupõhisest repositooriumist.
 
 Failis `server/query.js` loodi funktsioon `createPlan()`.
 See koondab otsingu, filtrid, sortimise ja lehekülje parameetrid üheks objektiks.
@@ -68,11 +68,10 @@ Plaan ei sõltu SQL-ist ega andmete salvestamise viisist. Funktsioon `apply()` e
 
 ---
 
-## 7. Koguarvu arvutamine enne lehekülje valimist
+## 7. Kontrolli testiga, et antud apply() arvutab kokku ENNE leheküljele lõikamist.
 
 Failis `materials/check-query.js` kontrolliti päringut `per=2&page=1`.
 Kontrolli tulemused:
-
 | Näitaja       | Tulemus |
 | ------------- | ------: |
 | `total`       |       4 |
@@ -83,7 +82,7 @@ Koguarv arvutatakse enne tulemuste jagamist lehekülgedeks. Nii saab klient tead
 
 ---
 
-## 8. Stabiilse sortimise kontroll
+## 8. Kontrolli testiga, et antud apply() sordib STABIILSELT: võrdsete korral otsustab id.
 
 Failis `materials/check-query.js` on ette valmistatud kolme sündmusega testmassiiv.
 Kõigi sündmuste hind on `10`, kuid ID-d on `3`, `1` ja `2`.
@@ -93,12 +92,11 @@ Kui hind on sama, sorteeritakse kirjed ID järgi kasvavas järjekorras.
 
 ---
 
-## 9. Tühja tulemuse kontroll
+## 9. Näita, et tühi tulemus annab kokku 0 ja lehti 1, mitte 404.
 
 Failis `materials/check-query.js` kontrolliti otsingut väärtusega `search: 'xyz'` faili `materials/events.json` andmete põhjal.
 Test käivitab `createPlan({ search: 'xyz' })` ja `apply()`. Ükski sündmus sellele otsingule ei vasta.
 Saadud tulemus:
-
 | Näitaja | Väärtus |
 | ------- | ------: |
 | `total` |       0 |
@@ -108,7 +106,7 @@ Tühi otsingutulemus ei põhjusta viga 404, vaid tagastab tühja tulemuste loend
 
 ---
 
-## 10. Ülesande kontrollimine
+## Kontrolli tulemus
 
 Käivitati käsk `node check-query.js` kaustas `materials`.
 Tulemus: `34 kontrolli OK`.
