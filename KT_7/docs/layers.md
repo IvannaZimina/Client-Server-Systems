@@ -1,6 +1,6 @@
 # C07 — Ülesanne 1: Kihiline arhitektuur
 
-## 1. Teenus saab repositooriumi ja kella parameetritena
+## 1. Kirjuta teenus, mis saab repositooriumi ja kella ({ now }) PARAMEETRINA, mitte ei impordi.
 
 Failis `server/layers.js` loodud funktsioon `createEventService(repository, { now })` saab repositooriumi ja kella parameetritena.
 Teenus ei impordi repositooriumi ega loo seda ise. Kell võimaldab kasutada testides kindlat kuupäeva ja kellaaega.
@@ -8,7 +8,7 @@ Kui kella ei anta, kasutatakse praegust aega.
 
 ---
 
-## 2. Ärireeglid on teenuses
+## 2. Pane ärireeglid teenusesse: vabu kohti, juba toimunud sündmus. 
 
 Ärireeglid on realiseeritud teenuse funktsioonides:
 - `buy()` kontrollib, et piletite kogus oleks positiivne täisarv.
@@ -20,7 +20,7 @@ Need kontrollid asuvad teenuses, sest nende jaoks on vaja sündmuse andmeid ja k
 
 ---
 
-## 3. Veatüübid on ServiceError-i liigid
+## 3. Viska antud ServiceError-it liigiga, mitte HTTP-koode. 
 
 Failist `materials/service-errors.js` kasutatakse olemasolevat `ServiceError` klassi ja veatüüpide ning HTTP-koodide seostamist.
 Teenus viskab veatüüpe, mitte HTTP-koode:
@@ -33,7 +33,7 @@ Teenus viskab veatüüpe, mitte HTTP-koode:
 
 ---
 
-## 4. Repositooriumi väljakutsete arv on kontrollitud
+## 4. Kontrolli loendava repositooriumiga, mitu korda teenus repositooriumi kutsub. 
 
 Kontrollimiseks kasutati failis `materials/memory-store.js` olevat loendavat repositooriumi.
 Pileti ostmisel ühe pileti jaoks saadi järgmised tulemused:
@@ -48,7 +48,7 @@ Teenus kasutab andmete lugemiseks ja muutmiseks ainult repositooriumi meetodeid.
 
 ---
 
-## 5. Teenust saab testida ilma Expressita
+## 5. VIHJE: kui su teenuse test vajab Expressi, on midagi vales kihis. 
 
 Failis `materials/check-layers.js` olev kontroll käivitab teenuse testid ilma Expressi ja HTTP-päringuteta.
 Teenus ei kasuta `req` ega `res` objekte.
@@ -56,7 +56,7 @@ Samuti ei sõltu see andmebaasist ega süsteemi tegelikust kuupäevast, sest rep
 
 ---
 
-## 6. Kontroller teeb täpselt kolm asja
+## 6. Kirjuta kontroller, mis teeb TÄPSELT kolm asja: võtab, kutsub, tõlgib. 
 
 Failis `server/layers.js` loodud `createEventsController()` kontroller täidab kolm ülesannet:
 1. **Võtab päringu andmed.** Kasutab `req.params`, `req.body`, `req.query` ja vajadusel kasutaja infot (`req.user` või `req.session.user`).
@@ -65,7 +65,7 @@ Failis `server/layers.js` loodud `createEventsController()` kontroller täidab k
 
 ---
 
-## 7. ServiceError teisendatakse HTTP-vastuseks ühes kohas
+## 7. Ühenda antud serviceErrorHandler(): vea liik saab koodi ÜHES kohas. 
 
 Failist `materials/service-errors.js` kasutatakse olemasolevat `serviceErrorHandler()` funktsiooni.
 Veatüübi ja HTTP-koodi seostamine toimub ühes kohas:
@@ -80,7 +80,7 @@ Veatüübi ja HTTP-koodi seostamine toimub ühes kohas:
 
 ---
 
-## 8. Tundmatu viga antakse edasi järgmisele veakäsitlejale
+## 8. Näita proovijooksuga, et tundmatu viga läheb EDASI (next(err)).
 
 Kontrollimiseks kasutati `TypeError` viga:
 
@@ -93,7 +93,7 @@ Kontrollis veenduti, et `next(err)` saab edasi `TypeError` vea. Tundmatut viga e
 
 ---
 
-## 9. Reeglite asukoht ja põhjendus
+## 9. Kirjuta docs/layers.md: kus on SINU koodis iga reegel ja miks just seal. 
 
 | Funktsioon                 | Reegel või ülesanne                                                  | Miks siin?                                                           |
 | -------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -107,25 +107,16 @@ Kontrollis veenduti, et `next(err)` saab edasi `TypeError` vea. Tundmatut viga e
 
 ---
 
-## 10. Kommit
+## Oodatav tulemus
 
-Ülesande failid lisati Git-i ja salvestati kommitiga:
-```cmd
-git add -A && git commit -m "C07 Ex1 — Kihiline arhitektuur"
-```
-
----
-
-# Oodatav tulemus
-
-## Sõltuvuste suund on tõestatav
+**Sõltuvuste suund on tõestatav**
 
 - `check-layers.js` ei impordi Expressi ega HTTP-d.
 - Teenus ei vaja andmebaasi ega süsteemi tegelikku kuupäeva.
 - Repositoorium ja kell antakse teenusele parameetritena.
 - Arhitektuuri suund: **Route → Controller → Service → Repository**.
 
-## Teenus kutsub repositooriumi — mõõdetud tulemus
+**Teenus kutsub repositooriumi — mõõdetud tulemus**
 
 | Meetod     | Väljakutsete arv |
 | ---------- | ---------------: |
@@ -133,7 +124,7 @@ git add -A && git commit -m "C07 Ex1 — Kihiline arhitektuur"
 | `addOrder` |                1 |
 | `findAll`  |                0 |
 
-## Veatüüp → HTTP-kood ühes kohas
+**Veatüüp → HTTP-kood ühes kohas**
 
 | Veatüüp           | HTTP-kood |
 | ----------------- | --------: |
